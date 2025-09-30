@@ -1,11 +1,1 @@
-{
-  "Version": 1,
-  "Hash": "lp29/AC4CQosRTEBgkQGjnOL7cQIIP7p6H/PN6uaRZA=",
-  "Source": "absolute_backend",
-  "BasePath": "_content/absolute_backend",
-  "Mode": "Default",
-  "ManifestType": "Build",
-  "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
-}
+{"Version":1,"Hash":"G3xfq1r91S5AnDA1pcvbMCQGmHZ/r5kczueb/RXGkVw=","Source":"absolute_backend","BasePath":"_content/absolute_backend","Mode":"Default","ManifestType":"Build","ReferencedProjectsConfiguration":[],"DiscoveryPatterns":[],"Assets":[],"Endpoints":[]}
