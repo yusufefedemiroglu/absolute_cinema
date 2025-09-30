@@ -3,6 +3,7 @@ using Core;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using Core.DTOs;
 
 namespace Infrastructure.Services;
 
@@ -65,6 +66,33 @@ public class TmdbService
         await _db.SaveChangesAsync();
         return movies;
     }
+
+    public async Task<List<Genre>> ImportGenresAsync()
+    {
+        var apiKey = _config["TMDb:ApiKey"];
+        var response = await _httpClient.GetFromJsonAsync<TmdbGenreResponse>(
+            $"genre/movie/list?api_key={apiKey}&language=en-US"
+        );
+
+        if (response == null) return new List<Genre>();
+
+        var imported = new List<Genre>();
+
+        foreach (var g in response.Genres)
+        {
+            var exists = await _db.Genres.FindAsync(g.Id);
+            if (exists == null)
+            {
+                var genre = new Genre { Name = g.Name };
+                _db.Genres.Add(genre);
+                imported.Add(genre);
+            }
+        }
+
+        await _db.SaveChangesAsync();
+        return imported;
+    }
+
     public async Task<List<TmdbMovieDto>> FetchPopularMoviesRawAsync()
     {
         var apiKey = _config["TMDb:ApiKey"];
@@ -74,7 +102,7 @@ public class TmdbService
 
         if (response == null) return new List<TmdbMovieDto>();
 
-        // Loglama
+        //log
         foreach (var r in response.Results)
         {
             Console.WriteLine($"Movie: {r.Title}, ReleaseDate(raw): {r.ReleaseDate}");
