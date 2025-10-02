@@ -55,8 +55,19 @@ public class TmdbService
 
 
                     PosterPath = r.PosterPath,
-                    Type = "movie"
+                    Type = "movie",
+                    TitleGenres = new List<TitleGenre>()
+
                 };
+                foreach (var gid in r.GenreIds)
+                {
+                    title.TitleGenres.Add(new TitleGenre
+                    {
+                        Title = title,
+                        GenreId = gid
+                    });
+                }
+
 
                 movies.Add(title);
                 _db.Titles.Add(title);
@@ -83,7 +94,7 @@ public class TmdbService
             var exists = await _db.Genres.FindAsync(g.Id);
             if (exists == null)
             {
-                var genre = new Genre { Name = g.Name };
+                var genre = new Genre { Name = g.Name, Id = g.Id };
                 _db.Genres.Add(genre);
                 imported.Add(genre);
             }

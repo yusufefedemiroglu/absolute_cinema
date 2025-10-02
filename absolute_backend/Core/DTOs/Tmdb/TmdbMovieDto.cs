@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Core.DTOs.Tmdb;
 
 public class TmdbMovieResponse
@@ -13,5 +15,8 @@ public class TmdbMovieDto
     public string ReleaseDate { get; set; } = "";
     public string PosterPath { get; set; } = "";
     public string FirstAirDate { get; set; } = "";
+
+    [JsonPropertyName("genre_ids")]
+    public List<int> GenreIds { get; set; } = new();
 
 }

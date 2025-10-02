@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace absolute_backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250924180832_InitialFix")]
-    partial class InitialFix
+    [Migration("20251002074947_FixGenreIds")]
+    partial class FixGenreIds
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -64,10 +64,7 @@ namespace absolute_backend.Migrations
             modelBuilder.Entity("Genre", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
