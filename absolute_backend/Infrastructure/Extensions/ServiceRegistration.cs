@@ -10,6 +10,7 @@ public static class ServiceRegistration
     {
         services.AddHttpClient<TmdbService>();
         services.AddScoped<TitleService>();
+        services.AddScoped<GenreService>();
 
 
         return services;
