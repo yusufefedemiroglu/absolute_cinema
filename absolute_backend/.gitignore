@@ -45,3 +45,8 @@ packages/
 
 .DS_Store
 Thumbs.db
+
+# Docker local overrides & env
+docker-compose.override.yml
+.env
+.env.*.local

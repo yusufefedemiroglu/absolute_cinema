@@ -338,3 +338,8 @@ C:/Users/Shadow/Desktop/absolute_cinema/absolute_backend/obj/Debug/net8.0/ref/ab
 /Users/shadow/Projects/absolute_cinema/absolute_backend/obj/Debug/net8.0/absolute_backend.pdb
 /Users/shadow/Projects/absolute_cinema/absolute_backend/obj/Debug/net8.0/absolute_backend.genruntimeconfig.cache
 /Users/shadow/Projects/absolute_cinema/absolute_backend/obj/Debug/net8.0/ref/absolute_backend.dll
+/Users/shadow/Projects/absolute_cinema/absolute_backend/bin/Debug/net8.0/MassTransit.dll
+/Users/shadow/Projects/absolute_cinema/absolute_backend/bin/Debug/net8.0/MassTransit.Abstractions.dll
+/Users/shadow/Projects/absolute_cinema/absolute_backend/bin/Debug/net8.0/MassTransit.EntityFrameworkCoreIntegration.dll
+/Users/shadow/Projects/absolute_cinema/absolute_backend/bin/Debug/net8.0/MassTransit.RabbitMqTransport.dll
+/Users/shadow/Projects/absolute_cinema/absolute_backend/bin/Debug/net8.0/RabbitMQ.Client.dll

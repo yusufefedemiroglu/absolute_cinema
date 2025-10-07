@@ -1,3 +1,5 @@
+using Core.Entities;
+using Infrastructure.Messaging.Sagas;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -14,6 +16,11 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Watchlist> Watchlists { get; set; }
     public DbSet<History> Histories { get; set; }
+
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<OrderState> OrderStates => Set<OrderState>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -14,7 +14,9 @@ builder.Services.AddControllers();
 
 
 //services
-builder.Services.AddApplicationServices();
+#pragma warning disable CS0612 // Type or member is obsolete
+builder.Services.AddApplicationServices().AddInfrastructureServices(builder.Configuration);
+#pragma warning restore CS0612 // Type or member is obsolete
 
 var app = builder.Build();
 
