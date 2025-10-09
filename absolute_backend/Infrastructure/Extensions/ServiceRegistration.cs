@@ -6,6 +6,7 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Infrastructure.Data.UnitOfWork;
 
 
 namespace Infrastructure.Extensions;
@@ -18,6 +19,7 @@ public static class ServiceRegistration
 
         services.AddScoped<Application.Services.TitleService>();
         services.AddScoped<Application.Services.GenreService>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         return services;
     }
 
