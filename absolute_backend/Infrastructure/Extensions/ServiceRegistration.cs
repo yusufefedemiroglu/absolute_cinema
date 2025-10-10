@@ -57,16 +57,21 @@ public static class ServiceRegistration
                  });
              });
 
+
             // RabbitMQ
             x.SetKebabCaseEndpointNameFormatter();
             x.UsingRabbitMq((context, cfg) =>
             {
                 // appsettings.json or secrets 
-                var host = config["RabbitMQ:Host"] ?? "rabbitmq://localhost";
-                cfg.Host(host, h =>
+                var host = config["RabbitMQ:Host"] ?? "localhost";
+                cfg.Host("localhost", "/", h =>
+ {
+     h.Username(config["RabbitMQ:Username"] ?? "guest");
+     h.Password(config["RabbitMQ:Password"] ?? "guest");
+ });
+                cfg.ReceiveEndpoint("payment", e =>
                 {
-                    h.Username(config["RabbitMQ:Username"] ?? "guest");
-                    h.Password(config["RabbitMQ:Password"] ?? "guest");
+                    e.ConfigureConsumer<PaymentConsumer>(context);
                 });
 
                 cfg.ConfigureEndpoints(context);
