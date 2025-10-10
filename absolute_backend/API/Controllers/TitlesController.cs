@@ -21,7 +21,7 @@ public class TitlesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var titles = await _titleService.GetAllTitlesAsync();
+        var titles = await _titleService.GetAllAsync();
         return Ok(titles);
     }
 

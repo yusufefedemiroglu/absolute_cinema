@@ -5,10 +5,10 @@ namespace Infrastructure.Messaging.Sagas;
 
 public class OrderSaga : MassTransitStateMachine<OrderState>
 {
-    public State Processing { get; private set; }
-    public Event<OrderCreatedEvent> OrderCreated { get; private set; }
-    public Event<PaymentSucceededEvent> PaymentSucceeded { get; private set; }
-    public Event<PaymentFailedEvent> PaymentFailed { get; private set; }
+    public State? Processing { get; private set; }
+    public Event<OrderCreatedEvent>? OrderCreated { get; private set; }
+    public Event<PaymentSucceededEvent>? PaymentSucceeded { get; private set; }
+    public Event<PaymentFailedEvent>? PaymentFailed { get; private set; }
 
     public OrderSaga()
     {

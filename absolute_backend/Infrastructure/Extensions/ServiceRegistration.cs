@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.Data.UnitOfWork;
+using Infrastructure.Data.Repositories.Concrete;
+using Infrastructure.Data.Repositories.Abstract;
 
 
 namespace Infrastructure.Extensions;
@@ -16,9 +18,10 @@ public static class ServiceRegistration
     // Application services
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-
+        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<Application.Services.TitleService>();
         services.AddScoped<Application.Services.GenreService>();
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         return services;
     }

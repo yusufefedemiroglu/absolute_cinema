@@ -27,4 +27,6 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     public void Update(T entity) => _dbSet.Update(entity);
 
     public void Remove(T entity) => _dbSet.Remove(entity);
+
+
 }

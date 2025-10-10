@@ -1,35 +1,21 @@
 using Core;
-using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
+using Infrastructure.Data.Repositories.Abstract;
+using Infrastructure.Data.UnitOfWork;
 
-namespace Application.Services;
-
-public class TitleService
+namespace Application.Services
 {
-    private readonly AppDbContext _db;
-
-    public TitleService(AppDbContext db)
+    public class TitleService : BaseService<Title>
     {
-        _db = db;
-    }
+        public TitleService(IGenericRepository<Title> repository, IUnitOfWork unitOfWork)
+            : base(repository, unitOfWork)
+        {
+        }
 
-    // get all movies
-    public async Task<List<Title>> GetAllTitlesAsync()
-    {
-        return await _db.Titles.ToListAsync();
-    }
-
-    // get one movie
-    public async Task<Title?> GetByIdAsync(int id)
-    {
-        return await _db.Titles.FindAsync(id);
-    }
-
-    // search func
-    public async Task<List<Title>> SearchAsync(string query)
-    {
-        return await _db.Titles
-            .Where(t => t.Name.Contains(query))
-            .ToListAsync();
+        // 🎯 Title’a özel metotlar
+        public async Task<List<Title>> SearchAsync(string query)
+        {
+            var allTitles = await _repo.GetAllAsync();
+            return allTitles.Where(t => t.Name.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
     }
 }
