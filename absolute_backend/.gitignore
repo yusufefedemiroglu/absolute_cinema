@@ -50,3 +50,5 @@ Thumbs.db
 docker-compose.override.yml
 .env
 .env.*.local
+.AssembyblyInfo.cs
+.AssembyblyInfoInputs.cache
