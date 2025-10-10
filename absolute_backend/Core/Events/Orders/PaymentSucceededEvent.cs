@@ -1,3 +1,3 @@
 namespace Core.Events.Orders;
 
-public record PaymentSucceededEvent(Guid CorrelationId, int OrderId);
+public record PaymentSucceededEvent(Guid CorrelationId, Guid OrderId);
