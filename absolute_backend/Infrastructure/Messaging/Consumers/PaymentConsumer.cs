@@ -19,7 +19,7 @@ public class PaymentConsumer : IConsumer<OrderCreatedEvent>
         await Task.Delay(2000); // Simulate payment processing delay
         // %80 chance of success of simulation
         var rnd = new Random();
-        if (rnd.NextDouble() > 3)
+        if (rnd.NextDouble() > 0.2)
         {
             await _publish.Publish(new PaymentSucceededEvent(order.CorrelationId, order.OrderId));
         }
