@@ -41,6 +41,7 @@ packages/
 *.trx
 *.coverage
 *.coveragexml
+.dll
 
 
 .DS_Store

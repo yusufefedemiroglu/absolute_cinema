@@ -1,3 +1,4 @@
+using Core.Entities;
 using Core.Events.Orders;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,7 @@ namespace API.Controllers
 
             await _publish.Publish(orderCreatedEvent);
 
-            Console.WriteLine($"📦 OrderCreatedEvent published → CorrelationId: {correlationId}");
+            Console.WriteLine($"📦 OrderCreatedEvent published → CorrelationId: {correlationId} Order Id = {orderCreatedEvent.OrderId}");
 
             return Ok(new
             {

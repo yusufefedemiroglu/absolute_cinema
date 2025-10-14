@@ -46,6 +46,7 @@ public static class ServiceRegistration
             // Consumers
             x.AddConsumer<PaymentConsumer>();
 
+
             // Saga State Machine
             x.AddSagaStateMachine<OrderSaga, OrderState>()
              .EntityFrameworkRepository(r =>
@@ -69,10 +70,7 @@ public static class ServiceRegistration
      h.Username(config["RabbitMQ:Username"] ?? "guest");
      h.Password(config["RabbitMQ:Password"] ?? "guest");
  });
-                cfg.ReceiveEndpoint("payment", e =>
-                {
-                    e.ConfigureConsumer<PaymentConsumer>(context);
-                });
+
 
                 cfg.ConfigureEndpoints(context);
             });
