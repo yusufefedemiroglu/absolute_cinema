@@ -20,12 +20,18 @@ public class OrderSaga : MassTransitStateMachine<OrderState>
 
         Initially(
             When(OrderCreated)
-                .Then(ctx =>
+                .ThenAsync(async ctx =>
                 {
                     ctx.Saga.OrderId = ctx.Message.OrderId;
                     ctx.Saga.ProductId = ctx.Message.ProductId;
                     ctx.Saga.Amount = ctx.Message.Amount;
                     Console.WriteLine($"🛒 Order {ctx.Saga.OrderId} created → waiting for payment...");
+
+                    await ctx.Publish(new StartPaymentCommand(
+                        ctx.Saga.CorrelationId,
+                        ctx.Saga.OrderId,
+                        ctx.Saga.ProductId,
+                        ctx.Saga.Amount));
                 })
                 .TransitionTo(Processing)
         );

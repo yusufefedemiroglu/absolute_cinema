@@ -3,7 +3,7 @@ using MassTransit;
 
 namespace Infrastructure.Messaging.Consumers;
 
-public class PaymentConsumer : IConsumer<OrderCreatedEvent>
+public class PaymentConsumer : IConsumer<StartPaymentCommand>
 {
     private readonly IPublishEndpoint _publish;
 
@@ -12,7 +12,7 @@ public class PaymentConsumer : IConsumer<OrderCreatedEvent>
         _publish = publish;
     }
 
-    public async Task Consume(ConsumeContext<OrderCreatedEvent> context)
+    public async Task Consume(ConsumeContext<StartPaymentCommand> context)
     {
         var order = context.Message;
         Console.WriteLine($"💳 Processing payment for Order {order.OrderId}");
