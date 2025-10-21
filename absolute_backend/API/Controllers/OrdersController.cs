@@ -1,48 +1,43 @@
-using Core.Entities;
-using Core.Events.Orders;
-using MassTransit;
+using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Controllers
+namespace API.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class OrdersController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class OrdersController : ControllerBase
+    private readonly OrderService _orderService;
+
+    public OrdersController(OrderService orderService)
     {
-        private readonly IPublishEndpoint _publish;
-
-        public OrdersController(IPublishEndpoint publish)
-        {
-            _publish = publish;
-        }
-
-        // 🎯 Saga’yı başlatan endpoint
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto dto)
-        {
-            var correlationId = Guid.NewGuid(); // Saga'nın takip ID'si
-
-            var orderCreatedEvent = new OrderCreatedEvent(
-                CorrelationId: correlationId,
-                OrderId: Guid.NewGuid(),
-                ProductId: dto.ProductId,
-                Amount: dto.Amount
-            );
-
-            await _publish.Publish(orderCreatedEvent);
-
-            Console.WriteLine($"📦 OrderCreatedEvent published → CorrelationId: {correlationId} Order Id = {orderCreatedEvent.OrderId}");
-
-            return Ok(new
-            {
-                Message = "Order event published successfully!",
-                CorrelationId = correlationId,
-                OrderId = orderCreatedEvent.OrderId,
-                ProductId = dto.ProductId,
-                Amount = dto.Amount
-            });
-        }
+        _orderService = orderService;
     }
 
-    public record CreateOrderDto(Guid ProductId, decimal Amount);
+    // 🔹 Create Order
+    [HttpPost("create")]
+    public async Task<IActionResult> Create([FromBody] CreateOrderDto dto)
+    {
+        var result = await _orderService.CreateOrderAsync(dto.ProductId, dto.Amount);
+        return Ok(result);
+    }
+
+    // 🔹 One specific order status
+    [HttpGet("status/{correlationId:guid}")]
+    public async Task<IActionResult> GetStatus(Guid correlationId)
+    {
+        var order = await _orderService.GetStatusAsync(correlationId);
+        if (order == null) return NotFound(new { message = "Order not found" });
+        return Ok(order);
+    }
+
+    // 🔹 All orders
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var orders = await _orderService.GetAllAsync();
+        return Ok(orders);
+    }
 }
+
+public record CreateOrderDto(Guid ProductId, decimal Amount);

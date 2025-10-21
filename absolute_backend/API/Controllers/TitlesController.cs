@@ -17,7 +17,7 @@ public class TitlesController : ControllerBase
         _tmdbService = tmdbService;
     }
 
-    // 🔹 DB'deki tüm filmler
+    // 🔹 All Movies
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -25,7 +25,7 @@ public class TitlesController : ControllerBase
         return Ok(titles);
     }
 
-    // 🔹 Tek film
+    // 🔹 One Movie
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -34,7 +34,7 @@ public class TitlesController : ControllerBase
         return Ok(title);
     }
 
-    // 🔹 Arama
+    // 🔹 Search
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] string query)
     {
@@ -42,7 +42,7 @@ public class TitlesController : ControllerBase
         return Ok(results);
     }
 
-    // 🔹 TMDb'den film import et
+    // 🔹 Import 
     [HttpPost("import/popular")]
     public async Task<IActionResult> ImportPopular()
     {

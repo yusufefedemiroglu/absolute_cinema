@@ -21,7 +21,7 @@ public static class ServiceRegistration
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<Application.Services.TitleService>();
         services.AddScoped<Application.Services.GenreService>();
-
+        services.AddScoped<Application.Services.OrderService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         return services;
     }
@@ -49,14 +49,18 @@ public static class ServiceRegistration
 
             // Saga State Machine
             x.AddSagaStateMachine<OrderSaga, OrderState>()
-             .EntityFrameworkRepository(r =>
+         .EntityFrameworkRepository(r =>
+         {
+             r.ConcurrencyMode = ConcurrencyMode.Optimistic; // default, no issue
+             r.ExistingDbContext<AppDbContext>();
+             r.AddDbContext<DbContext, AppDbContext>((provider, builder) =>
              {
-                 r.ConcurrencyMode = ConcurrencyMode.Optimistic;
-                 r.AddDbContext<DbContext, AppDbContext>((provider, builder) =>
-                 {
-                     builder.UseSqlServer(config.GetConnectionString("DefaultConnection"));
-                 });
+                 builder.UseSqlServer(
+                     config.GetConnectionString("DefaultConnection"),
+                     m => m.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
+                 );
              });
+         });
 
 
             // RabbitMQ

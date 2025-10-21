@@ -24,6 +24,15 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // auto decimal precision for all decimal properties(i forgor)
+        /*foreach (var property in modelBuilder.Model
+    .GetEntityTypes()
+    .SelectMany(t => t.GetProperties())
+    .Where(p => p.ClrType == typeof(decimal)))
+{
+    property.SetPrecision(18);
+    property.SetScale(2);
+} */
         modelBuilder.Entity<OrderState>()
        .Property(o => o.Amount)
        .HasPrecision(18, 2);
