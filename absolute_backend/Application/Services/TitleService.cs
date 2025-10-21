@@ -1,6 +1,8 @@
 using Core;
+using Infrastructure.Data;
 using Infrastructure.Data.Repositories.Abstract;
 using Infrastructure.Data.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
@@ -17,5 +19,15 @@ namespace Application.Services
             var allTitles = await _repo.GetAllAsync();
             return allTitles.Where(t => t.Name.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
         }
+        public async Task<List<Title>> GetAllWithDetailsAsync(AppDbContext context)
+        {
+            return await context.Titles
+                .Include(t => t.TitleGenres)
+                    .ThenInclude(tg => tg.Genre)
+                .Include(t => t.Credits)
+                    .ThenInclude(c => c.Person)
+                .ToListAsync();
+        }
+
     }
 }

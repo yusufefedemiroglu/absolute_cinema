@@ -21,11 +21,11 @@ public class PaymentConsumer : IConsumer<StartPaymentCommand>
         var rnd = new Random();
         if (rnd.NextDouble() > 0.2)
         {
-            await _publish.Publish(new PaymentSucceededEvent(order.CorrelationId, order.OrderId));
+            await _publish.Publish(new PaymentSucceededEvent(order.CorrelationId, order.ProductId, order.Amount, order.OrderId));
         }
         else
         {
-            await _publish.Publish(new PaymentFailedEvent(order.CorrelationId, order.OrderId, "Insufficient funds"));
+            await _publish.Publish(new PaymentFailedEvent(order.CorrelationId, order.ProductId, order.Amount, order.OrderId, "Insufficient funds"));
         }
     }
 }

@@ -22,6 +22,7 @@ public static class ServiceRegistration
         services.AddScoped<Application.Services.TitleService>();
         services.AddScoped<Application.Services.GenreService>();
         services.AddScoped<Application.Services.OrderService>();
+        services.AddScoped<Application.Services.OrderHistoryService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         return services;
     }
@@ -45,6 +46,7 @@ public static class ServiceRegistration
         {
             // Consumers
             x.AddConsumer<PaymentConsumer>();
+            x.AddConsumer<OrderHistoryConsumer>();
 
 
             // Saga State Machine
@@ -74,7 +76,10 @@ public static class ServiceRegistration
      h.Username(config["RabbitMQ:Username"] ?? "guest");
      h.Password(config["RabbitMQ:Password"] ?? "guest");
  });
-
+                cfg.ReceiveEndpoint("order-history", e =>
+                {
+                    e.ConfigureConsumer<OrderHistoryConsumer>(context);
+                });
 
                 cfg.ConfigureEndpoints(context);
             });

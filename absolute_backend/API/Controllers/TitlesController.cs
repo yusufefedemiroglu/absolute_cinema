@@ -1,4 +1,5 @@
 using Application.Services;
+using Infrastructure.Data;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,17 +12,19 @@ public class TitlesController : ControllerBase
     private readonly TitleService _titleService;
     private readonly TmdbService _tmdbService;
 
-    public TitlesController(TitleService titleService, TmdbService tmdbService)
+    private readonly AppDbContext _context;
+
+    public TitlesController(TitleService titleService, TmdbService tmdbService, AppDbContext context)
     {
         _titleService = titleService;
         _tmdbService = tmdbService;
+        _context = context;
     }
 
-    // 🔹 All Movies
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [HttpGet("with-details")]
+    public async Task<IActionResult> GetAllWithDetails([FromServices] AppDbContext context)
     {
-        var titles = await _titleService.GetAllAsync();
+        var titles = await _titleService.GetAllWithDetailsAsync(context);
         return Ok(titles);
     }
 
