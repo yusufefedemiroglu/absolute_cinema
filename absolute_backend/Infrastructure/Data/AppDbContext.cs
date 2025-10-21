@@ -24,6 +24,17 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<OrderState>()
+       .Property(o => o.Amount)
+       .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Payment>()
+            .Property(p => p.Amount)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Product>()
+            .Property(p => p.Price)
+            .HasPrecision(18, 2);
         // Composite keys
         modelBuilder.Entity<TitleGenre>()
             .HasKey(tg => new { tg.TitleId, tg.GenreId });
