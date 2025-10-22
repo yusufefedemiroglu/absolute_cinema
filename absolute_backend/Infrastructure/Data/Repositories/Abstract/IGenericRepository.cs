@@ -10,5 +10,8 @@ public interface IGenericRepository<T> where T : class
     Task AddAsync(T entity);
     void Update(T entity);
     void Remove(T entity);
+    Task<IEnumerable<T>> GetAllWithIncludeAsync(
+      Func<IQueryable<T>, IQueryable<T>> include
+  );
 
 }

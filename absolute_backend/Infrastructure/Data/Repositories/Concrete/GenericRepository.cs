@@ -28,5 +28,14 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
     public void Remove(T entity) => _dbSet.Remove(entity);
 
+    public async Task<IEnumerable<T>> GetAllWithIncludeAsync(
+        Func<IQueryable<T>, IQueryable<T>> include)
+    {
+        IQueryable<T> query = _context.Set<T>();
 
+        if (include != null)
+            query = include(query);
+
+        return await query.ToListAsync();
+    }
 }

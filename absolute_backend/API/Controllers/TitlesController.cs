@@ -1,5 +1,6 @@
+using Application.DTOs;
+using Application.DTOs.Titles;
 using Application.Services;
-using Infrastructure.Data;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,23 +13,34 @@ public class TitlesController : ControllerBase
     private readonly TitleService _titleService;
     private readonly TmdbService _tmdbService;
 
-    private readonly AppDbContext _context;
-
-    public TitlesController(TitleService titleService, TmdbService tmdbService, AppDbContext context)
+    public TitlesController(TitleService titleService, TmdbService tmdbService)
     {
         _titleService = titleService;
         _tmdbService = tmdbService;
-        _context = context;
     }
 
-    [HttpGet("with-details")]
-    public async Task<IActionResult> GetAllWithDetails([FromServices] AppDbContext context)
+    // LITE – Homepage optimized
+    [HttpGet("lite")]
+    [ProducesResponseType(typeof(List<TitleLiteDto>), 200)]
+    public async Task<ActionResult<List<TitleLiteDto>>> GetAllLite()
     {
-        var titles = await _titleService.GetAllWithDetailsAsync(context);
+        var titles = await _titleService.GetAllLiteAsync();
+        if (!titles.Any())
+            return NotFound(new { Message = "No titles found." });
+
         return Ok(titles);
     }
 
-    // 🔹 One Movie
+    // Detailed version
+    [HttpGet("with-details")]
+    [ProducesResponseType(typeof(List<TitleDetailDto>), 200)]
+    public async Task<ActionResult<List<TitleDetailDto>>> GetAllWithDetails()
+    {
+        var titles = await _titleService.GetAllWithDetailsAsync();
+        return Ok(titles);
+    }
+
+    //  Single title
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -37,7 +49,7 @@ public class TitlesController : ControllerBase
         return Ok(title);
     }
 
-    // 🔹 Search
+    // Search
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] string query)
     {
@@ -45,7 +57,7 @@ public class TitlesController : ControllerBase
         return Ok(results);
     }
 
-    // 🔹 Import 
+    // mport popular from TMDb
     [HttpPost("import/popular")]
     public async Task<IActionResult> ImportPopular()
     {
@@ -56,11 +68,12 @@ public class TitlesController : ControllerBase
             Movies = movies
         });
     }
+
+    //Raw TMDb (debug/test)
     [HttpGet("tmdb/raw")]
     public async Task<IActionResult> GetPopularMoviesRaw()
     {
         var movies = await _tmdbService.FetchPopularMoviesRawAsync();
         return Ok(movies);
     }
-
 }
