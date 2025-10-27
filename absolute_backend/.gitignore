@@ -1,4 +1,3 @@
-# Build klasörleri
 bin/
 obj/
 
@@ -42,7 +41,9 @@ packages/
 *.coverage
 *.coveragexml
 .dll
-
+.pdb
+.AssemblyInfo.cs
+.AssemblyInfoInputs.cache
 
 .DS_Store
 Thumbs.db
