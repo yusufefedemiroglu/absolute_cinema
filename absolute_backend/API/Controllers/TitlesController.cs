@@ -22,6 +22,7 @@ public class TitlesController : ControllerBase
     // LITE – Homepage optimized
     [HttpGet("lite")]
     [ProducesResponseType(typeof(List<TitleLiteDto>), 200)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<List<TitleLiteDto>>> GetAllLite()
     {
         var titles = await _titleService.GetAllLiteAsync();
