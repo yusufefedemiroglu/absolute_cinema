@@ -35,7 +35,7 @@ namespace Infrastructure.Data.UnitOfWork
         public async Task BeginTransactionAsync()
         {
             if (_currentTransaction != null)
-                return; // zaten bir transaction varsa tekrar başlatma
+                return;
 
             _currentTransaction = await _context.Database.BeginTransactionAsync();
         }

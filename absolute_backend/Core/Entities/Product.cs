@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Core.Entities
 {
@@ -6,6 +7,7 @@ namespace Core.Entities
     {
         public Guid Id { get; set; }
         public int TitleId { get; set; }
+        [JsonIgnore]
         public Title Title { get; set; } = null!;
 
         public string Name { get; set; } = string.Empty;

@@ -31,7 +31,6 @@ public class ProductService : BaseService<Product>
         return p.Id;
     }
 
-    // 🔹 Ürün güncelle
     public async Task<bool> UpdateAsync(Guid id, Product input)
     {
         var entity = await _repo.GetByIdAsync(id);
