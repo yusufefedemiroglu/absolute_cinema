@@ -22,6 +22,7 @@ public static class ServiceRegistration
         services.AddScoped<Application.Services.TitleService>();
         services.AddScoped<Application.Services.GenreService>();
         services.AddScoped<Application.Services.OrderService>();
+        services.AddScoped<Application.Services.ProductService>();
         services.AddScoped<Application.Services.OrderHistoryService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         return services;
