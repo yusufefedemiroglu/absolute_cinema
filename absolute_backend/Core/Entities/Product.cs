@@ -1,12 +1,19 @@
-namespace Core.Entities;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Product
+namespace Core.Entities
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-    public decimal Price { get; set; }
-    public int Stock { get; set; }
+    public class Product
+    {
+        public Guid Id { get; set; }
+        public int TitleId { get; set; }
+        public Title Title { get; set; } = null!;
 
-    //one product can have one title
-    public int? TitleId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public string ImageUrl { get; set; } = string.Empty;
+        public int Stock { get; set; } = 0;
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
 }

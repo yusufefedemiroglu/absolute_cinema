@@ -1,3 +1,5 @@
+using Core.Entities;
+
 public class Title
 {
     public int Id { get; set; }            // DB PK
@@ -14,4 +16,6 @@ public class Title
 
     public ICollection<Credit> Credits { get; set; } = new List<Credit>();
     public ICollection<TitleGenre> TitleGenres { get; set; } = new List<TitleGenre>();
+
+    public ICollection<Product> Products { get; set; } = new List<Product>();
 }

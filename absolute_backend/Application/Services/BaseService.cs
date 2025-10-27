@@ -20,7 +20,7 @@ namespace Application.Services
             return result.ToList();
         }
 
-        public virtual async Task<T?> GetByIdAsync(int id) =>
+        public virtual async Task<T?> GetByIdAsync(Guid id) =>
             await _repo.GetByIdAsync(id);
 
         public virtual async Task AddAsync(T entity)

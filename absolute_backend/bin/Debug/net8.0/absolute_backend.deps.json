@@ -9,12 +9,12 @@
       "absolute_backend/1.0.0": {
         "dependencies": {
           "MassTransit": "8.5.4",
+          "MassTransit.EntityFrameworkCore": "8.5.4",
           "MassTransit.RabbitMQ": "8.5.4",
           "Microsoft.AspNetCore.OpenApi": "8.0.8",
           "Microsoft.EntityFrameworkCore.Design": "9.0.9",
           "Microsoft.EntityFrameworkCore.SqlServer": "9.0.9",
-          "Swashbuckle.AspNetCore": "6.4.0",
-          "MassTransit.EntityFrameworkCore": "8.5.4"
+          "Swashbuckle.AspNetCore": "6.4.0"
         },
         "runtime": {
           "absolute_backend.dll": {}

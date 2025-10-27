@@ -36,6 +36,13 @@ public class AppDbContext : DbContext
             property.SetScale(2);
         }
 
+        modelBuilder.Entity<Product>()
+       .HasOne(p => p.Title)
+       .WithMany(t => t.Products)
+       .HasForeignKey(p => p.TitleId)
+       .OnDelete(DeleteBehavior.Cascade);
+
+
         modelBuilder.Entity<OrderState>()
        .Property(o => o.Amount)
        .HasPrecision(18, 2);

@@ -42,7 +42,7 @@ public class TitlesController : ControllerBase
 
     //  Single title
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(Guid id)
     {
         var title = await _titleService.GetByIdAsync(id);
         if (title == null) return NotFound();
