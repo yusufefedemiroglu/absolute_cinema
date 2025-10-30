@@ -1,3 +1,4 @@
+using Application.DTOs.Product;
 using Application.Services;
 using Core.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -40,9 +41,21 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] Product product)
+    public async Task<IActionResult> Create([FromBody] ProductCreateDto product)
     {
-        var id = await _productService.CreateAsync(product);
+        ModelState.Remove("Title");
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var id = await _productService.CreateAsync(new Product
+        {
+            TitleId = product.TitleId,
+            Name = product.Name,
+            Description = product.Description,
+            Price = product.Price,
+            ImageUrl = product.ImageUrl,
+            Stock = product.Stock
+        });
         return CreatedAtAction(nameof(GetById), new { id }, product);
     }
 
