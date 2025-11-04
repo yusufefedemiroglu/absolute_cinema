@@ -1,6 +1,10 @@
+using Application.Validators;
 using Infrastructure.Data;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +15,32 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+builder.Services
+    .AddFluentValidationAutoValidation() // auto server-side validation
+    .AddFluentValidationClientsideAdapters(); // for client-side validation
+
+builder.Services.AddValidatorsFromAssemblyContaining<ProductCreateValidator>(); // register validators
+
+builder.Services.Configure<ApiBehaviorOptions>(options => // automatic model validation response
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(e => e.Value?.Errors.Count > 0)
+            .SelectMany(x => x.Value!.Errors)
+            .Select(x => x.ErrorMessage)
+            .ToList();
+
+        var response = new Application.Exceptions.ErrorResponse
+        {
+            StatusCode = 400,
+            Message = "Validation failed",
+            Details = errors
+        };
+
+        return new BadRequestObjectResult(response);
+    };
+});
 
 
 //services

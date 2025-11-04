@@ -1,4 +1,4 @@
-namespace Application.DTOs
+namespace Application.DTOs.Titles
 {
     public class TitleLiteDto
     {
@@ -7,7 +7,7 @@ namespace Application.DTOs
 
         public string Name { get; set; } = string.Empty;
 
-        public string PosterPath{ get; set; } = string.Empty;
+        public string PosterPath { get; set; } = string.Empty;
 
         public double VoteAverage { get; set; }
 

@@ -56,7 +56,8 @@ public class ExceptionMiddleware
                         : "An unexpected error occurred",
                     Details = _env.IsDevelopment() ? ex.StackTrace : null
                 }
-            };
+            }
+        ;
 
             context.Response.StatusCode = response.StatusCode;
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
