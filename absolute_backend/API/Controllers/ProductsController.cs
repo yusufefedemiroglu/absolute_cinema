@@ -47,6 +47,8 @@ public class ProductsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
+
+        // Map DTO to Product
         var id = await _productService.CreateAsync(new Product
         {
             TitleId = product.TitleId,
