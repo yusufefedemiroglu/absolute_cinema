@@ -62,9 +62,17 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] Product product)
+    public async Task<IActionResult> Update(Guid id, [FromBody] ProductUpdateDto product)
     {
-        var updated = await _productService.UpdateAsync(id, product);
+        var updated = await _productService.UpdateAsync(id, new Product
+        {
+            TitleId = product.TitleId ?? 0,
+            Name = product.Name ?? string.Empty,
+            Description = product.Description ?? string.Empty,
+            Price = product.Price ?? 0,
+            ImageUrl = product.ImageUrl ?? string.Empty,
+            Stock = product.Stock ?? 0
+        });
         if (!updated)
             return NotFound();
 

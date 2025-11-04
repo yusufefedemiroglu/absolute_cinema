@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
+using Application.Validators.Product;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,7 @@ builder.Services
     .AddFluentValidationClientsideAdapters(); // for client-side validation
 
 builder.Services.AddValidatorsFromAssemblyContaining<ProductCreateValidator>(); // register validators
+builder.Services.AddValidatorsFromAssemblyContaining<ProductUpdateValidator>();
 
 builder.Services.Configure<ApiBehaviorOptions>(options => // automatic model validation response
 {
