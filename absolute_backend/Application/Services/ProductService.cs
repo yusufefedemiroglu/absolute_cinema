@@ -1,4 +1,5 @@
 using Application.DTOs.Product;
+using Application.Exceptions;
 using Core.Entities;
 using Infrastructure.Data.Repositories.Abstract;
 using Infrastructure.Data.UnitOfWork;
@@ -26,7 +27,8 @@ public class ProductService : BaseService<Product>
     {
         p.Id = Guid.NewGuid();
         p.CreatedAt = DateTime.UtcNow;
-
+        if (p.Price < 0) //exception test 
+            throw new ApiException(400, "Price cannot be negative", new { field = "price" });
         await _repo.AddAsync(p);
         await _uow.SaveChangesAsync();
         return p.Id;
