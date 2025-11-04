@@ -40,10 +40,10 @@ packages/
 *.trx
 *.coverage
 *.coveragexml
-.dll
-.pdb
-.AssemblyInfo.cs
-.AssemblyInfoInputs.cache
+*.dll
+*.pdb
+*.AssemblyInfo.cs
+*.AssemblyInfoInputs.cache
 
 .DS_Store
 Thumbs.db
