@@ -7,7 +7,13 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Application.Validators.Product;
 
+
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -50,6 +56,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options => // automatic model val
 builder.Services.AddApplicationServices().AddInfrastructureServices(builder.Configuration);
 #pragma warning restore CS0612 // Type or member is obsolete
 
+
 var app = builder.Build();
 
 app.UseMiddleware<Infrastructure.Middleware.ExceptionMiddleware>();
@@ -68,4 +75,6 @@ app.MapControllers();
 
 app.Run();
 
+app.Run();
 
+Log.CloseAndFlush();
