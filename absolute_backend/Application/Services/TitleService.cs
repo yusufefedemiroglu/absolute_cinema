@@ -14,12 +14,16 @@ namespace Application.Services
             : base(repo, uow) { }
 
         // search by query
-        public async Task<List<Title>> SearchAsync(string query)
+        public async Task<List<TitleLiteDto>> SearchAsync(string query)
         {
-            var all = await _repo.GetAllAsync();
-            return all
-                .Where(t => t.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            query = query.ToLower().Trim();
+
+            var titles = await _repo.Query()
+                .Include(t => t.TitleGenres).ThenInclude(g => g.Genre)
+                .Where(t => t.Name.ToLower().Contains(query))
+                .ToListAsync();
+
+            return titles.Select(TitleMapper.ToLite).ToList();
         }
 
         // full detailed list
@@ -45,19 +49,24 @@ namespace Application.Services
         }
 
         // get by TMDb ID 
-        public async Task<Title?> GetByTmdbIdAsync(int tmdbId)
+        public async Task<TitleReadDto?> GetByTmdbIdAsync(int tmdbId)
         {
-            return await _repo.Query()
-                .WithFullDetails()
+            var title = await _repo.Query()
+                .Include(t => t.TitleGenres).ThenInclude(g => g.Genre)
                 .FirstOrDefaultAsync(t => t.TmdbId == tmdbId);
+
+            return title == null ? null : TitleMapper.ToRead(title);
+        }
+        // get by local DB ID to dto
+        public async Task<TitleReadDto?> GetByLocalIdAsync(int id)
+        {
+            var title = await _repo.Query()
+                .Include(t => t.TitleGenres).ThenInclude(g => g.Genre)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            return title == null ? null : TitleMapper.ToRead(title);
         }
 
-        // get by local DB ID
-        public async Task<Title?> GetByLocalIdAsync(int id)
-        {
-            return await _repo.Query()
-                .WithFullDetails()
-                .FirstOrDefaultAsync(t => t.Id == id);
-        }
+
     }
 }

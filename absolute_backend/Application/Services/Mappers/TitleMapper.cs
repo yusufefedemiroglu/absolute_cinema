@@ -15,6 +15,7 @@ namespace Application.Services.Mappers
         {
             return new TitleLiteDto
             {
+                Id = t.Id,
                 TmdbId = t.TmdbId,
                 Name = t.Name,
                 PosterPath = BuildPoster(t.PosterPath),

@@ -70,9 +70,15 @@ public class TitlesController : ControllerBase
 
     // Search
     [HttpGet("search")]
+    [ProducesResponseType(typeof(List<TitleReadDto>), 200)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> Search([FromQuery] string query)
     {
-        var results = await _titleService.SearchAsync(query);
+        if (string.IsNullOrWhiteSpace(query))
+            return BadRequest(new { Message = "Search query cannot be empty." });
+
+        var results = await _titleService.SearchAsync(query.Trim());
+
         return Ok(results);
     }
 
