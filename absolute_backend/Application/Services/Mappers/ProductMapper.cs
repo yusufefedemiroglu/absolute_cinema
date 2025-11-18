@@ -17,7 +17,7 @@ namespace Application.Mappers
                 Price = p.Price,
                 ImageUrl = p.ImageUrl,
                 Stock = p.Stock,
-                CreatedAt = p.CreatedAt,
+                Date = p.CreatedAt.ToString("dd.MM.yyyy"),
                 TitleName = p.Title?.Name
             };
         }

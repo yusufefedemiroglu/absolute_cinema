@@ -1,4 +1,5 @@
 using Application.DTOs.Product;
+using Application.Mappers;
 using Core.Entities;
 using Infrastructure.Data.Repositories.Abstract;
 using Infrastructure.Data.UnitOfWork;
@@ -8,84 +9,77 @@ namespace Application.Services;
 
 public class ProductService : BaseService<Product>
 {
-    private readonly IGenericRepository<Title> _titleRepo;
-
-    public ProductService(
-        IGenericRepository<Product> repo,
-        IUnitOfWork uow,
-        IGenericRepository<Title> titleRepo)
+    public ProductService(IGenericRepository<Product> repo, IUnitOfWork uow)
         : base(repo, uow)
     {
-        _titleRepo = titleRepo;
     }
 
-    //get by TitleId
-    public async Task<List<Product>> GetByTitleIdAsync(int titleId)
+    public async Task<List<ProductReadDto>> GetAllReadAsync()
     {
-        return await _repo.Query()
+        var products = await _repo.Query()
+            .Include(p => p.Title)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return products.Select(ProductMapper.ToReadDto).ToList();
+    }
+
+
+    public async Task<ProductReadDto?> GetReadByIdAsync(Guid id)
+    {
+        var product = await _repo.Query()
+            .Include(p => p.Title)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        return product == null ? null : ProductMapper.ToReadDto(product);
+    }
+
+
+    public async Task<List<ProductReadDto>> GetByTitleIdAsync(int titleId)
+    {
+        var products = await _repo.Query()
+            .Include(p => p.Title)
             .AsNoTracking()
             .Where(p => p.TitleId == titleId)
             .ToListAsync();
+
+        return products.Select(ProductMapper.ToReadDto).ToList();
     }
 
-    //create with dto
+
     public async Task<Guid> CreateAsync(int titleId, ProductCreateDto dto)
     {
-        //check if title exists
-        var titleExists = await _titleRepo.Query().AnyAsync(t => t.Id == titleId);
-        if (!titleExists)
-            throw new Exception("Title not found.");
+        var entity = ProductMapper.ToEntity(dto);
+        entity.Id = Guid.NewGuid();
+        entity.TitleId = titleId;
+        entity.CreatedAt = DateTime.UtcNow;
 
-        var product = new Product
-        {
-            Id = Guid.NewGuid(),
-            TitleId = titleId,
-            Name = dto.Name,
-            Description = dto.Description,
-            Price = dto.Price,
-            ImageUrl = dto.ImageUrl,
-            Stock = dto.Stock,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        await _repo.AddAsync(product);
+        await _repo.AddAsync(entity);
         await _uow.SaveChangesAsync();
 
-        return product.Id;
+        return entity.Id;
     }
 
-    //update with dto
+
     public async Task<bool> UpdateAsync(Guid id, ProductUpdateDto dto)
     {
         var entity = await _repo.GetByIdAsync(id);
-        if (entity is null)
+        if (entity == null)
             return false;
-        //if titleId is being updated, check existence(validation should handle most cases)
-        if (dto.TitleId.HasValue)
-        {
-            var exists = await _titleRepo.Query().AnyAsync(t => t.Id == dto.TitleId.Value);
-            if (!exists)
-                throw new Exception("TitleId does not exist.");
-            entity.TitleId = dto.TitleId.Value;
-        }
-        // optional fields 
-        entity.Name = dto.Name ?? entity.Name;
-        entity.Description = dto.Description ?? entity.Description;
-        entity.Price = dto.Price ?? entity.Price;
-        entity.ImageUrl = dto.ImageUrl ?? entity.ImageUrl;
-        entity.Stock = dto.Stock ?? entity.Stock;
+
+        ProductMapper.UpdateEntity(entity, dto);
 
         _repo.Update(entity);
         await _uow.SaveChangesAsync();
-
         return true;
     }
 
-    // delete by ID
+
     public async Task<bool> DeleteAsync(Guid id)
     {
         var entity = await _repo.GetByIdAsync(id);
-        if (entity is null)
+        if (entity == null)
             return false;
 
         _repo.Remove(entity);

@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Application.DTOs.Product
 {
     public class ProductReadDto
@@ -9,7 +11,7 @@ namespace Application.DTOs.Product
         public decimal Price { get; set; }
         public string ImageUrl { get; set; } = string.Empty;
         public int Stock { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public string Date { get; set; } = string.Empty;
         public string? TitleName { get; set; }   // optional, if we want to include the title name
     }
 }

@@ -15,54 +15,67 @@ public class ProductsController : ControllerBase
         _productService = productService;
     }
 
-    // get all products
+
     [HttpGet]
+    [ProducesResponseType(typeof(List<ProductReadDto>), 200)]
     public async Task<IActionResult> GetAll()
     {
-        var products = await _productService.GetAllAsync();
+        var products = await _productService.GetAllReadAsync();
         return Ok(products);
     }
 
-    //get by id guid.
+
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(ProductReadDto), 200)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var product = await _productService.GetByIdAsync(id);
+        var product = await _productService.GetReadByIdAsync(id);
         if (product == null)
             return NotFound(new { Message = "Product not found." });
 
         return Ok(product);
     }
 
-    // getbytitleid
+
     [HttpGet("by-title/{titleId:int}")]
+    [ProducesResponseType(typeof(List<ProductReadDto>), 200)]
     public async Task<IActionResult> GetByTitleId(int titleId)
     {
         var products = await _productService.GetByTitleIdAsync(titleId);
         return Ok(products);
     }
-    // create with dto
-    [HttpPost("{titleId:int}")]
+
+
+    [HttpPost("create/{titleId:int}")]
+    [ProducesResponseType(typeof(ProductReadDto), 201)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> Create(int titleId, [FromBody] ProductCreateDto dto)
     {
         var id = await _productService.CreateAsync(titleId, dto);
-        return CreatedAtAction(nameof(GetById), new { id }, dto);
+
+        var created = await _productService.GetReadByIdAsync(id);
+
+        return CreatedAtAction(nameof(GetById), new { id }, created);
     }
 
-    // update with dto
+
     [HttpPut("{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Update(Guid id, [FromBody] ProductUpdateDto dto)
     {
-        var updated = await _productService.UpdateAsync(id, dto);
-
-        if (!updated)
+        var success = await _productService.UpdateAsync(id, dto);
+        if (!success)
             return NotFound(new { Message = "Product not found." });
 
         return NoContent();
     }
 
-    // delete by id
+
     [HttpDelete("{id:guid}")]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var deleted = await _productService.DeleteAsync(id);

@@ -38,5 +38,18 @@ namespace Application.Services.Mappers
                 Genres = t.TitleGenres.Select(g => g.Genre.Name).ToList()
             };
         }
+        public static TitleReadDto ToRead(Title t)
+        {
+            return new TitleReadDto
+            {
+                Id = t.Id,
+                TmdbId = t.TmdbId,
+                Name = t.Name,
+                Overview = t.Overview ?? "",
+                PosterPath = BuildPoster(t.PosterPath),
+                VoteAverage = t.VoteAverage,
+                Type = t.Type ?? ""
+            };
+        }
     }
 }
