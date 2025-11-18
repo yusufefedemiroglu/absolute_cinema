@@ -13,13 +13,10 @@ namespace Application.Validators
         public ProductCreateValidator(AppDbContext context)
         {
             _context = context;
-            RuleFor(p => p.TitleId)
-                .GreaterThan(0)
-                .WithMessage("A valid TitleId must be provided.").Must(TitleExists).WithMessage("TitleId does not exist.");
 
             RuleFor(p => p.Name)
                 .NotEmpty().WithMessage("Product name is required.")
-                .MaximumLength(100).WithMessage("Product name cannot exceed 100 characters.").NotEmpty().WithMessage("Message cannot be empty.");
+                .MaximumLength(100).WithMessage("Product name cannot exceed 100 characters.");
 
             RuleFor(p => p.Description)
                 .MaximumLength(500).WithMessage("Description cannot exceed 500 characters.").NotEmpty().WithMessage("Description cannot be empty.");
@@ -33,6 +30,7 @@ namespace Application.Validators
             RuleFor(p => p.ImageUrl)
                 .Must(url => string.IsNullOrEmpty(url) || Uri.IsWellFormedUriString(url, UriKind.Absolute))
                 .WithMessage("ImageUrl must be a valid URL if provided.");
+
         }
         private bool TitleExists(int titleId)
         {
