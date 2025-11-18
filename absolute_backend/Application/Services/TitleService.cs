@@ -66,5 +66,17 @@ namespace Application.Services
         // little helper
         private static string BuildPosterUrl(string? posterPath)
             => string.IsNullOrWhiteSpace(posterPath) ? string.Empty : $"{ImageBase}{posterPath}";
+
+        public async Task<Title?> GetByLocalIdAsync(int id)
+        {
+            return await _repo.Query()
+                .FirstOrDefaultAsync(t => t.Id == id);
+        }
+        public async Task<Title?> GetByTmdbIdAsync(int tmdbId)
+        {
+            return await _repo.Query()
+                .Include(t => t.TitleGenres).ThenInclude(g => g.Genre)
+                .FirstOrDefaultAsync(t => t.TmdbId == tmdbId);
+        }
     }
 }
