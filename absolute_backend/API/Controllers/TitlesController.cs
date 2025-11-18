@@ -79,6 +79,9 @@ public class TitlesController : ControllerBase
 
         var results = await _titleService.SearchAsync(query.Trim());
 
+        if (results.Count == 0)
+            return NotFound(new { message = "No titles found." });
+
         return Ok(results);
     }
 
