@@ -9,7 +9,7 @@ namespace Application.DTOs.Titles
 
         public string PosterPath { get; set; } = string.Empty;
 
-        public string PosterUrl { get; set; } = string.Empty;
+
 
         public double VoteAverage { get; set; }
 

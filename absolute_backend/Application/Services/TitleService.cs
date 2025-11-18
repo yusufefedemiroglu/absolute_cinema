@@ -23,13 +23,16 @@ namespace Application.Services
                 .ToList();
         }
 
+        private IQueryable<Title> IncludeGenres(IQueryable<Title> query)
+        {
+            return query
+                .Include(t => t.TitleGenres)
+                .ThenInclude(tg => tg.Genre);
+        }
         // detailed list
         public async Task<List<TitleDetailDto>> GetAllWithDetailsAsync()
         {
-            var titles = await _repo.GetAllWithIncludeAsync(q =>
-                q.Include(t => t.TitleGenres)
-                 .ThenInclude(tg => tg.Genre)
-            );
+            var titles = await _repo.GetAllWithIncludeAsync(IncludeGenres);
 
             return titles.Select(t => new TitleDetailDto
             {
@@ -48,10 +51,7 @@ namespace Application.Services
         // lite list for homepage
         public async Task<List<TitleLiteDto>> GetAllLiteAsync()
         {
-            var titles = await _repo.GetAllWithIncludeAsync(q =>
-                q.Include(t => t.TitleGenres)
-                 .ThenInclude(tg => tg.Genre)
-            );
+            var titles = await _repo.GetAllWithIncludeAsync(IncludeGenres);
 
             return titles.Select(t => new TitleLiteDto
             {

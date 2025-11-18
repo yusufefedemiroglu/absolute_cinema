@@ -2,8 +2,8 @@ namespace Application.DTOs.Titles
 {
     public class TitleDetailDto
     {
-        public int Id { get; set; }
-        public int TmdbId { get; set; }
+        public int Id { get; set; } //Local db id
+        public int TmdbId { get; set; } //TMDB id
         public string Name { get; set; } = string.Empty;
         public string Overview { get; set; } = string.Empty;
         public DateTime? ReleaseDate { get; set; }
