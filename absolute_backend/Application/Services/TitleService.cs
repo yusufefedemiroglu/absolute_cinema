@@ -1,5 +1,6 @@
-using Application.DTOs;
 using Application.DTOs.Titles;
+using Application.Services.Mappers;
+using Application.Services.Queries;
 using Core;
 using Infrastructure.Data.Repositories.Abstract;
 using Infrastructure.Data.UnitOfWork;
@@ -9,74 +10,54 @@ namespace Application.Services
 {
     public class TitleService : BaseService<Title>
     {
-        private const string ImageBase = "https://image.tmdb.org/t/p/w500";
+        public TitleService(IGenericRepository<Title> repo, IUnitOfWork uow)
+            : base(repo, uow) { }
 
-        public TitleService(IGenericRepository<Title> repository, IUnitOfWork unitOfWork)
-            : base(repository, unitOfWork) { }
-
-        // in memory search (for demo purposes)
+        // search by query
         public async Task<List<Title>> SearchAsync(string query)
         {
-            var allTitles = await _repo.GetAllAsync();
-            return allTitles
+            var all = await _repo.GetAllAsync();
+            return all
                 .Where(t => t.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
 
-        private IQueryable<Title> IncludeGenres(IQueryable<Title> query)
-        {
-            return query
-                .Include(t => t.TitleGenres)
-                .ThenInclude(tg => tg.Genre);
-        }
-        // detailed list
+        // full detailed list
         public async Task<List<TitleDetailDto>> GetAllWithDetailsAsync()
         {
-            var titles = await _repo.GetAllWithIncludeAsync(IncludeGenres);
+            var titles = await _repo.Query()
+                .WithFullDetails()
+                .AsNoTracking()
+                .ToListAsync();
 
-            return titles.Select(t => new TitleDetailDto
-            {
-                Id = t.Id,
-                TmdbId = t.TmdbId,
-                Name = t.Name,
-                Overview = t.Overview ?? string.Empty,
-                ReleaseDate = t.ReleaseDate,
-                PosterPath = BuildPosterUrl(t.PosterPath),
-                VoteAverage = t.VoteAverage,
-                Type = t.Type ?? string.Empty,
-                Genres = t.TitleGenres.Select(g => g.Genre.Name).ToList()
-            }).ToList();
+            return titles.Select(TitleMapper.ToDetail).ToList();
         }
 
-        // lite list for homepage
+        // lite homepage optimized list
         public async Task<List<TitleLiteDto>> GetAllLiteAsync()
         {
-            var titles = await _repo.GetAllWithIncludeAsync(IncludeGenres);
+            var titles = await _repo.Query()
+                .WithGenres()
+                .AsNoTracking()
+                .ToListAsync();
 
-            return titles.Select(t => new TitleLiteDto
-            {
-                TmdbId = t.TmdbId,
-                Name = t.Name,
-                PosterPath = BuildPosterUrl(t.PosterPath),
-                VoteAverage = t.VoteAverage,
-                Genres = t.TitleGenres.Select(g => g.Genre.Name).ToList()
-            }).ToList();
+            return titles.Select(TitleMapper.ToLite).ToList();
         }
 
-        // little helper
-        private static string BuildPosterUrl(string? posterPath)
-            => string.IsNullOrWhiteSpace(posterPath) ? string.Empty : $"{ImageBase}{posterPath}";
-
-        public async Task<Title?> GetByLocalIdAsync(int id)
-        {
-            return await _repo.Query()
-                .FirstOrDefaultAsync(t => t.Id == id);
-        }
+        // get by TMDb ID 
         public async Task<Title?> GetByTmdbIdAsync(int tmdbId)
         {
             return await _repo.Query()
-                .Include(t => t.TitleGenres).ThenInclude(g => g.Genre)
+                .WithFullDetails()
                 .FirstOrDefaultAsync(t => t.TmdbId == tmdbId);
+        }
+
+        // get by local DB ID
+        public async Task<Title?> GetByLocalIdAsync(int id)
+        {
+            return await _repo.Query()
+                .WithFullDetails()
+                .FirstOrDefaultAsync(t => t.Id == id);
         }
     }
 }
