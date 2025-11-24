@@ -37,7 +37,7 @@ try
     {
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     });
-
+    builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
     builder.Services.AddControllers();
