@@ -7,14 +7,26 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Application.Validators.Product;
 using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.Elasticsearch;
 
 try
 {
     Log.Logger = new LoggerConfiguration()
-        .MinimumLevel.Debug()
-        .WriteTo.Console()
-        .WriteTo.File("logs/app-.log", rollingInterval: RollingInterval.Day)
-        .CreateLogger();
+     .MinimumLevel.Information()
+     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+     .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+     .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Error)
+     .MinimumLevel.Override("System", LogEventLevel.Warning)
+     .Enrich.FromLogContext()
+     .WriteTo.Console()
+     .WriteTo.File("logs/app-.log", rollingInterval: RollingInterval.Day)
+     .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+     {
+         AutoRegisterTemplate = true,
+         IndexFormat = $"absolute-logs-{DateTime.UtcNow:yyyy-MM}"
+     })
+     .CreateLogger();
 
     Log.Information("Starting application...");
 
