@@ -1,5 +1,5 @@
 using Application.DTOs.Product;
-using Application.Mappers;
+using AutoMapper;
 using Core.Entities;
 using Infrastructure.Data.Repositories.Abstract;
 using Infrastructure.Data.UnitOfWork;
@@ -9,11 +9,18 @@ namespace Application.Services;
 
 public class ProductService : BaseService<Product>
 {
-    public ProductService(IGenericRepository<Product> repo, IUnitOfWork uow)
+    private readonly IMapper _mapper;
+
+    public ProductService(
+        IGenericRepository<Product> repo,
+        IUnitOfWork uow,
+        IMapper mapper)
         : base(repo, uow)
     {
+        _mapper = mapper;
     }
 
+    // READ ALL (DTO)
     public async Task<List<ProductReadDto>> GetAllReadAsync()
     {
         var products = await _repo.Query()
@@ -21,10 +28,10 @@ public class ProductService : BaseService<Product>
             .AsNoTracking()
             .ToListAsync();
 
-        return products.Select(ProductMapper.ToReadDto).ToList();
+        return _mapper.Map<List<ProductReadDto>>(products);
     }
 
-
+    // READ BY ID (DTO)
     public async Task<ProductReadDto?> GetReadByIdAsync(Guid id)
     {
         var product = await _repo.Query()
@@ -32,10 +39,10 @@ public class ProductService : BaseService<Product>
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == id);
 
-        return product == null ? null : ProductMapper.ToReadDto(product);
+        return _mapper.Map<ProductReadDto?>(product);
     }
 
-
+    // READ BY TITLE ID (DTO)
     public async Task<List<ProductReadDto>> GetByTitleIdAsync(int titleId)
     {
         var products = await _repo.Query()
@@ -44,13 +51,13 @@ public class ProductService : BaseService<Product>
             .Where(p => p.TitleId == titleId)
             .ToListAsync();
 
-        return products.Select(ProductMapper.ToReadDto).ToList();
+        return _mapper.Map<List<ProductReadDto>>(products);
     }
 
-
+    // CREATE
     public async Task<Guid> CreateAsync(int titleId, ProductCreateDto dto)
     {
-        var entity = ProductMapper.ToEntity(dto);
+        var entity = _mapper.Map<Product>(dto);
         entity.Id = Guid.NewGuid();
         entity.TitleId = titleId;
         entity.CreatedAt = DateTime.UtcNow;
@@ -61,21 +68,21 @@ public class ProductService : BaseService<Product>
         return entity.Id;
     }
 
-
+    // UPDATE (partial)
     public async Task<bool> UpdateAsync(Guid id, ProductUpdateDto dto)
     {
         var entity = await _repo.GetByIdAsync(id);
         if (entity == null)
             return false;
 
-        ProductMapper.UpdateEntity(entity, dto);
+        _mapper.Map(dto, entity); // partial update auto
 
         _repo.Update(entity);
         await _uow.SaveChangesAsync();
         return true;
     }
 
-
+    // DELETE
     public async Task<bool> DeleteAsync(Guid id)
     {
         var entity = await _repo.GetByIdAsync(id);

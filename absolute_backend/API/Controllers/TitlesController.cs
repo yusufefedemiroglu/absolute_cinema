@@ -1,4 +1,3 @@
-using Application.DTOs;
 using Application.DTOs.Titles;
 using Application.Services;
 using Infrastructure.Services;
@@ -12,18 +11,20 @@ public class TitlesController : ControllerBase
 {
     private readonly TitleService _titleService;
     private readonly TmdbService _tmdbService;
+    private readonly ILogger<TitlesController> _logger;
 
-    public TitlesController(TitleService titleService, TmdbService tmdbService)
+    public TitlesController(TitleService titleService, TmdbService tmdbService, ILogger<TitlesController> logger)
     {
         _titleService = titleService;
         _tmdbService = tmdbService;
+        _logger = logger;
     }
 
-    // LITE – Homepage optimized
+    // LITE (homepage)
     [HttpGet("lite")]
     [ProducesResponseType(typeof(List<TitleLiteDto>), 200)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<List<TitleLiteDto>>> GetAllLite()
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetAllLite()
     {
         var titles = await _titleService.GetAllLiteAsync();
 
@@ -33,18 +34,18 @@ public class TitlesController : ControllerBase
         return Ok(titles);
     }
 
-    // Detailed list
+    // FULL DETAILS
     [HttpGet("with-details")]
     [ProducesResponseType(typeof(List<TitleDetailDto>), 200)]
-    public async Task<ActionResult<List<TitleDetailDto>>> GetAllWithDetails()
+    public async Task<IActionResult> GetAllWithDetails()
     {
         var titles = await _titleService.GetAllWithDetailsAsync();
         return Ok(titles);
     }
 
-    // Single Title (LOCAL DB ID)
+    // LOCAL DB ID
     [HttpGet("{id:int}")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(TitleReadDto), 200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetByLocalId(int id)
     {
@@ -55,9 +56,9 @@ public class TitlesController : ControllerBase
         return Ok(title);
     }
 
-    // Single Title (TMDb ID)
+    // TMDB ID
     [HttpGet("tmdb/{tmdbId:int}")]
-    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(TitleReadDto), 200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetByTmdbId(int tmdbId)
     {
@@ -68,10 +69,11 @@ public class TitlesController : ControllerBase
         return Ok(title);
     }
 
-    // Search
+    // SEARCH
     [HttpGet("search")]
-    [ProducesResponseType(typeof(List<TitleReadDto>), 200)]
+    [ProducesResponseType(typeof(List<TitleLiteDto>), 200)]
     [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> Search([FromQuery] string query)
     {
         if (string.IsNullOrWhiteSpace(query))
@@ -80,16 +82,17 @@ public class TitlesController : ControllerBase
         var results = await _titleService.SearchAsync(query.Trim());
 
         if (results.Count == 0)
-            return NotFound(new { message = "No titles found." });
+            return NotFound(new { Message = "No titles found." });
 
         return Ok(results);
     }
 
-    // Import popular movies from TMDb
+    // IMPORT POPULAR
     [HttpPost("import/popular")]
     public async Task<IActionResult> ImportPopular()
     {
         var movies = await _tmdbService.ImportPopularMoviesAsync();
+
         return Ok(new
         {
             Message = $"{movies.Count} movies imported.",
@@ -97,7 +100,7 @@ public class TitlesController : ControllerBase
         });
     }
 
-    // Raw TMDb data
+    // RAW TMDB (debug)
     [HttpGet("tmdb/raw")]
     public async Task<IActionResult> GetPopularMoviesRaw()
     {

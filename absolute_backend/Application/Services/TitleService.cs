@@ -1,6 +1,6 @@
 using Application.DTOs.Titles;
-using Application.Services.Mappers;
 using Application.Services.Queries;
+using AutoMapper;
 using Core;
 using Infrastructure.Data.Repositories.Abstract;
 using Infrastructure.Data.UnitOfWork;
@@ -10,10 +10,15 @@ namespace Application.Services
 {
     public class TitleService : BaseService<Title>
     {
-        public TitleService(IGenericRepository<Title> repo, IUnitOfWork uow)
-            : base(repo, uow) { }
+        private readonly IMapper _mapper;
 
-        // search by query
+        public TitleService(IGenericRepository<Title> repo, IUnitOfWork uow, IMapper mapper)
+            : base(repo, uow)
+        {
+            _mapper = mapper;
+        }
+
+        // SEARCH
         public async Task<List<TitleLiteDto>> SearchAsync(string query)
         {
             query = query.ToLower().Trim();
@@ -21,12 +26,13 @@ namespace Application.Services
             var titles = await _repo.Query()
                 .Include(t => t.TitleGenres).ThenInclude(g => g.Genre)
                 .Where(t => t.Name.ToLower().Contains(query))
+                .AsNoTracking()
                 .ToListAsync();
 
-            return titles.Select(TitleMapper.ToLite).ToList();
+            return _mapper.Map<List<TitleLiteDto>>(titles);
         }
 
-        // full detailed list
+        // FULL DETAILS
         public async Task<List<TitleDetailDto>> GetAllWithDetailsAsync()
         {
             var titles = await _repo.Query()
@@ -34,10 +40,10 @@ namespace Application.Services
                 .AsNoTracking()
                 .ToListAsync();
 
-            return titles.Select(TitleMapper.ToDetail).ToList();
+            return _mapper.Map<List<TitleDetailDto>>(titles);
         }
 
-        // lite homepage optimized list
+        // LITE LIST (homepage)
         public async Task<List<TitleLiteDto>> GetAllLiteAsync()
         {
             var titles = await _repo.Query()
@@ -45,28 +51,29 @@ namespace Application.Services
                 .AsNoTracking()
                 .ToListAsync();
 
-            return titles.Select(TitleMapper.ToLite).ToList();
+            return _mapper.Map<List<TitleLiteDto>>(titles);
         }
 
-        // get by TMDb ID 
+        // GET BY TMDB ID
         public async Task<TitleReadDto?> GetByTmdbIdAsync(int tmdbId)
         {
             var title = await _repo.Query()
                 .Include(t => t.TitleGenres).ThenInclude(g => g.Genre)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.TmdbId == tmdbId);
 
-            return title == null ? null : TitleMapper.ToRead(title);
+            return _mapper.Map<TitleReadDto?>(title);
         }
-        // get by local DB ID to dto
+
+        // GET BY LOCAL ID
         public async Task<TitleReadDto?> GetByLocalIdAsync(int id)
         {
             var title = await _repo.Query()
                 .Include(t => t.TitleGenres).ThenInclude(g => g.Genre)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
 
-            return title == null ? null : TitleMapper.ToRead(title);
+            return _mapper.Map<TitleReadDto?>(title);
         }
-
-
     }
 }

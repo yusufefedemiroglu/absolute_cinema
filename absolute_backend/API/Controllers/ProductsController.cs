@@ -11,41 +11,39 @@ public class ProductsController : ControllerBase
     private readonly ProductService _productService;
     private readonly ILogger<ProductsController> _logger;
 
-
     public ProductsController(ProductService productService, ILogger<ProductsController> logger)
     {
         _productService = productService;
         _logger = logger;
     }
 
-
+    // GET ALL
     [HttpGet]
     [ProducesResponseType(typeof(List<ProductReadDto>), 200)]
     public async Task<IActionResult> GetAll()
     {
         var products = await _productService.GetAllReadAsync();
         return Ok(products);
-
     }
 
-
+    // GET BY ID
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ProductReadDto), 200)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetById(Guid id)
     {
-        _logger.LogInformation("Product Get by ID called — Guid: {TitleId},", id);
+        _logger.LogInformation("Product GET by ID called — Guid: {ProductId}", id);
 
-        var product = await _productService.GetReadByIdAsync(id);
-        if (product == null)
+        var p = await _productService.GetReadByIdAsync(id);
+        if (p == null)
             return NotFound(new { Message = "Product not found." });
 
-        _logger.LogInformation("Product Get by ID worked — Guid: {TitleId},", id);
+        _logger.LogInformation("Product GET by ID success — Guid: {ProductId}", id);
 
-        return Ok(product);
+        return Ok(p);
     }
 
-
+    // GET BY TITLE ID
     [HttpGet("by-title/{titleId:int}")]
     [ProducesResponseType(typeof(List<ProductReadDto>), 200)]
     public async Task<IActionResult> GetByTitleId(int titleId)
@@ -54,20 +52,19 @@ public class ProductsController : ControllerBase
         return Ok(products);
     }
 
-
+    // CREATE
     [HttpPost("create/{titleId:int}")]
     [ProducesResponseType(typeof(ProductReadDto), 201)]
     [ProducesResponseType(400)]
     public async Task<IActionResult> Create(int titleId, [FromBody] ProductCreateDto dto)
     {
         var id = await _productService.CreateAsync(titleId, dto);
-
         var created = await _productService.GetReadByIdAsync(id);
 
         return CreatedAtAction(nameof(GetById), new { id }, created);
     }
 
-
+    // UPDATE
     [HttpPut("{id:guid}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
@@ -80,14 +77,14 @@ public class ProductsController : ControllerBase
         return NoContent();
     }
 
-
+    // DELETE
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var deleted = await _productService.DeleteAsync(id);
-        if (!deleted)
+        var success = await _productService.DeleteAsync(id);
+        if (!success)
             return NotFound(new { Message = "Product not found." });
 
         return NoContent();
