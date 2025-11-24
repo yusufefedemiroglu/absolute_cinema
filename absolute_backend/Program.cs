@@ -20,7 +20,6 @@ try
      .MinimumLevel.Override("System", LogEventLevel.Warning)
      .Enrich.FromLogContext()
      .WriteTo.Console()
-     .WriteTo.File("logs/app-.log", rollingInterval: RollingInterval.Day)
      .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
      {
          AutoRegisterTemplate = true,
