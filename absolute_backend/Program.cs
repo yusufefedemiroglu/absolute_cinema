@@ -47,6 +47,7 @@ try
     });
 
     builder.Services.AddSwaggerGen();
+
     builder.Services.AddControllers(options =>
 {
     options.Filters.Add<LoggingActionFilter>();
