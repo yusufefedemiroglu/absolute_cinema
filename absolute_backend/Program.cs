@@ -62,10 +62,10 @@ try
 
     // Redis cache
     builder.Services.AddStackExchangeRedisCache(options =>
-    {
-        options.Configuration = builder.Configuration.GetConnectionString("Redis");
-        options.InstanceName = "absolute_cinema:"; // key prefix
-    });
+  {
+      options.Configuration = builder.Configuration["Redis:Connection"];
+      options.InstanceName = "absolute_";
+  });
 
     builder.Services.Configure<ApiBehaviorOptions>(options =>
     {

@@ -10,8 +10,8 @@ using Infrastructure.Data.UnitOfWork;
 using Infrastructure.Data.Repositories.Concrete;
 using Infrastructure.Data.Repositories.Abstract;
 using Application.Filters;
-using Infrastructure.Caching;
 using Application.Abstractions.Caching;
+using Infrastructure.Cache;
 
 
 namespace Infrastructure.Extensions;
