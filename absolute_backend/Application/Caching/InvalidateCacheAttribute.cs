@@ -15,10 +15,10 @@ public class InvalidateCacheAttribute : Attribute, IAsyncActionFilter
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        await next();
+        var result = await next();
 
         var cache = context.HttpContext.RequestServices.GetRequiredService<ICacheService>();
 
-        await cache.RemoveAsync(_pattern);
+        await cache.RemoveByPatternAsync(_pattern);
     }
 }

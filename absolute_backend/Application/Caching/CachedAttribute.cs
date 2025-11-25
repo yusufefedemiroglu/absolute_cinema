@@ -1,37 +1,56 @@
 using Application.Abstractions.Caching;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Text;
 
 namespace Application.Caching.Attributes;
 
 [AttributeUsage(AttributeTargets.Method)]
 public class CachedAttribute : Attribute, IAsyncActionFilter
 {
-    public string Key { get; }
-    public int DurationSeconds { get; }
+    private readonly int _durationSeconds;
 
-    public CachedAttribute(string key, int durationSeconds = 60)
+    public CachedAttribute(int durationSeconds = 60)
     {
-        Key = key;
-        DurationSeconds = durationSeconds;
+        _durationSeconds = durationSeconds;
     }
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var cache = context.HttpContext.RequestServices.GetRequiredService<ICacheService>();
 
-        var cached = await cache.GetAsync<object>(Key);
+        var key = BuildCacheKey(context);
+
+        var cached = await cache.GetAsync<string>(key);
         if (cached != null)
         {
-            context.Result = new Microsoft.AspNetCore.Mvc.JsonResult(cached);
+            context.Result = new ContentResult
+            {
+                Content = cached,
+                ContentType = "application/json",
+                StatusCode = 200
+            };
             return;
         }
 
-        var executedContext = await next();
+        var executed = await next();
 
-        if (executedContext.Result is Microsoft.AspNetCore.Mvc.ObjectResult ok &&
-            ok.Value is not null)
+        if (executed.Result is ObjectResult ok && ok.Value != null)
         {
-            await cache.SetAsync(Key, ok.Value, TimeSpan.FromSeconds(DurationSeconds));
+            var json = System.Text.Json.JsonSerializer.Serialize(ok.Value);
+            await cache.SetAsync(key, json, TimeSpan.FromSeconds(_durationSeconds));
         }
+    }
+
+    private string BuildCacheKey(ActionExecutingContext ctx)
+    {
+        var sb = new StringBuilder();
+
+        sb.Append($"{ctx.HttpContext.Request.Path}");
+
+        foreach (var (key, value) in ctx.ActionArguments)
+            sb.Append($"|{key}-{value}");
+
+        return sb.ToString().ToLower();
     }
 }
