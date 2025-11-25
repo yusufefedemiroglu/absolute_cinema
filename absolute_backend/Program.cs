@@ -12,6 +12,7 @@ using Serilog.Sinks.Elasticsearch;
 using Application.Mappers;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Filters;
+using StackExchange.Redis;
 
 try
 {
@@ -60,12 +61,11 @@ try
     builder.Services.AddValidatorsFromAssemblyContaining<ProductCreateValidator>();
     builder.Services.AddValidatorsFromAssemblyContaining<ProductUpdateValidator>();
 
-    // Redis cache
-    builder.Services.AddStackExchangeRedisCache(options =>
-  {
-      options.Configuration = builder.Configuration["Redis:Connection"];
-      options.InstanceName = "absolute_";
-  });
+    builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    {
+        var config = builder.Configuration["Redis:Connection"] ?? throw new Exception("Redis connection string is not configured.");
+        return ConnectionMultiplexer.Connect(config);
+    });
 
     builder.Services.Configure<ApiBehaviorOptions>(options =>
     {
