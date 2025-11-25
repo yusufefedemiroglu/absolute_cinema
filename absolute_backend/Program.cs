@@ -60,6 +60,13 @@ try
     builder.Services.AddValidatorsFromAssemblyContaining<ProductCreateValidator>();
     builder.Services.AddValidatorsFromAssemblyContaining<ProductUpdateValidator>();
 
+    // Redis cache
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = builder.Configuration.GetConnectionString("Redis");
+        options.InstanceName = "absolute_cinema:"; // key prefix
+    });
+
     builder.Services.Configure<ApiBehaviorOptions>(options =>
     {
         options.InvalidModelStateResponseFactory = context =>
