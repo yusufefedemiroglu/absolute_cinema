@@ -18,6 +18,13 @@ services:
       - "6379:6379"
     command: ["redis-server", "--appendonly", "yes"]
 
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redis_insight
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
 
 
   elasticsearch:
