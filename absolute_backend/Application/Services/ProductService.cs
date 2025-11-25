@@ -14,8 +14,9 @@ public class ProductService : BaseService<Product>
     public ProductService(
         IGenericRepository<Product> repo,
         IUnitOfWork uow,
-        IMapper mapper)
-        : base(repo, uow)
+        IMapper mapper,
+        ILogger<BaseService<Product>> logger)
+        : base(repo, uow, logger)
     {
         _mapper = mapper;
     }

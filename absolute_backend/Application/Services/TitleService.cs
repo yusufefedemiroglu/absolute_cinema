@@ -12,8 +12,8 @@ namespace Application.Services
     {
         private readonly IMapper _mapper;
 
-        public TitleService(IGenericRepository<Title> repo, IUnitOfWork uow, IMapper mapper)
-            : base(repo, uow)
+        public TitleService(IGenericRepository<Title> repo, IUnitOfWork uow, IMapper mapper, ILogger<BaseService<Title>> logger)
+            : base(repo, uow, logger)
         {
             _mapper = mapper;
         }

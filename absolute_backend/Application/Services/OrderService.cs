@@ -10,10 +10,13 @@ public class OrderService
     private readonly IPublishEndpoint _publish;
     private readonly AppDbContext _db;
 
-    public OrderService(IPublishEndpoint publish, AppDbContext db)
+    private readonly ILogger<OrderService> _logger;
+
+    public OrderService(IPublishEndpoint publish, AppDbContext db, ILogger<OrderService> logger)
     {
         _publish = publish;
         _db = db;
+        _logger = logger;
     }
 
     // 🔹 Create New Order
@@ -30,6 +33,7 @@ public class OrderService
 
         await _publish.Publish(orderCreated);
         Console.WriteLine($"📦 OrderCreatedEvent published → CorrelationId: {correlationId}");
+        _logger.LogInformation("OrderCreatedEvent published → CorrelationId: {CorrelationId}", correlationId);
 
         return new
         {

@@ -9,12 +9,10 @@ namespace API.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly ProductService _productService;
-    private readonly ILogger<ProductsController> _logger;
 
-    public ProductsController(ProductService productService, ILogger<ProductsController> logger)
+    public ProductsController(ProductService productService)
     {
         _productService = productService;
-        _logger = logger;
     }
 
     // GET ALL
@@ -32,13 +30,10 @@ public class ProductsController : ControllerBase
     [ProducesResponseType(404)]
     public async Task<IActionResult> GetById(Guid id)
     {
-        _logger.LogInformation("Product GET by ID called — Guid: {ProductId}", id);
 
         var p = await _productService.GetReadByIdAsync(id);
         if (p == null)
             return NotFound(new { Message = "Product not found." });
-
-        _logger.LogInformation("Product GET by ID success — Guid: {ProductId}", id);
 
         return Ok(p);
     }

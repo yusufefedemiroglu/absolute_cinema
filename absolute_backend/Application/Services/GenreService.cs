@@ -6,8 +6,8 @@ namespace Application.Services
 {
     public class GenreService : BaseService<Genre>
     {
-        public GenreService(IGenericRepository<Genre> repository, IUnitOfWork unitOfWork)
-            : base(repository, unitOfWork)
+        public GenreService(IGenericRepository<Genre> repository, IUnitOfWork unitOfWork, ILogger<BaseService<Genre>> logger)
+            : base(repository, unitOfWork, logger)
         {
         }
     }
