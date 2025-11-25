@@ -1,3 +1,4 @@
+using Application.Caching.Attributes;
 using Application.DTOs.Titles;
 using Application.Services;
 using Infrastructure.Services;
@@ -21,6 +22,7 @@ public class TitlesController : ControllerBase
     }
 
     // LITE (homepage)
+    [Cached(60)]
     [HttpGet("lite")]
     [ProducesResponseType(typeof(List<TitleLiteDto>), 200)]
     [ProducesResponseType(404)]
@@ -35,6 +37,7 @@ public class TitlesController : ControllerBase
     }
 
     // FULL DETAILS
+    [Cached(60)]
     [HttpGet("with-details")]
     [ProducesResponseType(typeof(List<TitleDetailDto>), 200)]
     public async Task<IActionResult> GetAllWithDetails()
@@ -44,6 +47,7 @@ public class TitlesController : ControllerBase
     }
 
     // LOCAL DB ID
+    [Cached(30)]
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(TitleReadDto), 200)]
     [ProducesResponseType(404)]
@@ -57,6 +61,7 @@ public class TitlesController : ControllerBase
     }
 
     // TMDB ID
+    [Cached(45)]
     [HttpGet("tmdb/{tmdbId:int}")]
     [ProducesResponseType(typeof(TitleReadDto), 200)]
     [ProducesResponseType(404)]
@@ -70,6 +75,7 @@ public class TitlesController : ControllerBase
     }
 
     // SEARCH
+    [Cached(20)]
     [HttpGet("search")]
     [ProducesResponseType(typeof(List<TitleLiteDto>), 200)]
     [ProducesResponseType(400)]

@@ -1,3 +1,4 @@
+using Application.Caching.Attributes;
 using Application.DTOs.Product;
 using Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,7 @@ public class ProductsController : ControllerBase
     }
 
     // GET ALL
+    [Cached(60)]
     [HttpGet]
     [ProducesResponseType(typeof(List<ProductReadDto>), 200)]
     public async Task<IActionResult> GetAll()
@@ -25,6 +27,7 @@ public class ProductsController : ControllerBase
     }
 
     // GET BY ID
+    [Cached(30)]
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ProductReadDto), 200)]
     [ProducesResponseType(404)]
@@ -39,6 +42,7 @@ public class ProductsController : ControllerBase
     }
 
     // GET BY TITLE ID
+    [Cached(45)]
     [HttpGet("by-title/{titleId:int}")]
     [ProducesResponseType(typeof(List<ProductReadDto>), 200)]
     public async Task<IActionResult> GetByTitleId(int titleId)
@@ -48,6 +52,7 @@ public class ProductsController : ControllerBase
     }
 
     // CREATE
+    [InvalidateCache("api/products")]
     [HttpPost("create/{titleId:int}")]
     [ProducesResponseType(typeof(ProductReadDto), 201)]
     [ProducesResponseType(400)]
@@ -61,6 +66,7 @@ public class ProductsController : ControllerBase
 
     // UPDATE
     [HttpPut("{id:guid}")]
+    [InvalidateCache("api/products")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> Update(Guid id, [FromBody] ProductUpdateDto dto)
@@ -74,6 +80,7 @@ public class ProductsController : ControllerBase
 
     // DELETE
     [HttpDelete("{id:guid}")]
+    [InvalidateCache("api/products")]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
     public async Task<IActionResult> Delete(Guid id)
