@@ -31,13 +31,6 @@ public class OrdersController : ControllerBase
         return Ok(order);
     }
 
-    // 🔹 All orders
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var orders = await _orderService.GetAllAsync();
-        return Ok(orders);
-    }
 }
 
 public record CreateOrderDto(Guid ProductId, decimal Amount);

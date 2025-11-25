@@ -9,6 +9,8 @@ using Application.Validators.Product;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
+using Application.Mappers;
+using Microsoft.Extensions.DependencyInjection;
 
 try
 {
@@ -37,8 +39,11 @@ try
     {
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     });
-    builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddAutoMapper(cfg =>
+    {
+        cfg.AddProfile<ProductProfile>();
+        cfg.AddProfile<TitleProfile>();
+    });
     builder.Services.AddSwaggerGen();
     builder.Services.AddControllers();
 
