@@ -10,6 +10,8 @@ using Infrastructure.Data.UnitOfWork;
 using Infrastructure.Data.Repositories.Concrete;
 using Infrastructure.Data.Repositories.Abstract;
 using Application.Filters;
+using Infrastructure.Caching;
+using Application.Abstractions.Caching;
 
 
 namespace Infrastructure.Extensions;
@@ -27,6 +29,7 @@ public static class ServiceRegistration
         services.AddScoped<Application.Services.OrderHistoryService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<LoggingActionFilter>();
+        services.AddScoped<ICacheService, RedisCacheService>();
         return services;
     }
 
