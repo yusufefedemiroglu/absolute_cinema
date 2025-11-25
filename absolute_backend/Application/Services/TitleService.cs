@@ -1,3 +1,4 @@
+using Application.Abstractions.Caching;
 using Application.DTOs.Titles;
 using Application.Services.Queries;
 using AutoMapper;
@@ -11,11 +12,13 @@ namespace Application.Services
     public class TitleService : BaseService<Title>
     {
         private readonly IMapper _mapper;
+        private readonly ICacheService _cache;
 
-        public TitleService(IGenericRepository<Title> repo, IUnitOfWork uow, IMapper mapper, ILogger<BaseService<Title>> logger)
+        public TitleService(IGenericRepository<Title> repo, IUnitOfWork uow, IMapper mapper, ILogger<BaseService<Title>> logger, ICacheService cache)
             : base(repo, uow, logger)
         {
             _mapper = mapper;
+            _cache = cache;
         }
 
         // SEARCH
@@ -46,12 +49,30 @@ namespace Application.Services
         // LITE LIST (homepage)
         public async Task<List<TitleLiteDto>> GetAllLiteAsync()
         {
+            string cacheKey = "titles-lite";
+
+            // 1) try get from cache
+            var cached = await _cache.GetAsync<List<TitleLiteDto>>(cacheKey);
+            if (cached != null)
+            {
+                _logger.LogInformation("CACHE HIT: titles-lite");
+                return cached;
+            }
+
+            // 2) not in cache, get from DB
             var titles = await _repo.Query()
                 .WithGenres()
                 .AsNoTracking()
                 .ToListAsync();
 
-            return _mapper.Map<List<TitleLiteDto>>(titles);
+            var mapped = _mapper.Map<List<TitleLiteDto>>(titles);
+
+            // 3) add to cache(30 mins)
+            await _cache.SetAsync(cacheKey, mapped, TimeSpan.FromMinutes(30));
+
+            _logger.LogInformation("CACHE MISS → DB'den çekildi ve cache'e eklendi: titles-lite");
+
+            return mapped;
         }
 
         // GET BY TMDB ID
