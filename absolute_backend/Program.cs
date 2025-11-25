@@ -11,6 +11,7 @@ using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
 using Application.Mappers;
 using Microsoft.Extensions.DependencyInjection;
+using Application.Filters;
 
 try
 {
@@ -44,8 +45,12 @@ try
         cfg.AddProfile<ProductProfile>();
         cfg.AddProfile<TitleProfile>();
     });
+
     builder.Services.AddSwaggerGen();
-    builder.Services.AddControllers();
+    builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<LoggingActionFilter>();
+});
 
     builder.Services
         .AddFluentValidationAutoValidation()

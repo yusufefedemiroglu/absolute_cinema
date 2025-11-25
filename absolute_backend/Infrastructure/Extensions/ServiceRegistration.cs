@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.Data.UnitOfWork;
 using Infrastructure.Data.Repositories.Concrete;
 using Infrastructure.Data.Repositories.Abstract;
+using Application.Filters;
 
 
 namespace Infrastructure.Extensions;
@@ -25,6 +26,7 @@ public static class ServiceRegistration
         services.AddScoped<Application.Services.ProductService>();
         services.AddScoped<Application.Services.OrderHistoryService>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<LoggingActionFilter>();
         return services;
     }
 
