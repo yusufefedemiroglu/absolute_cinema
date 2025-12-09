@@ -11,7 +11,7 @@ public class User
 
     public string Roles { get; set; } = "User";
 
-    public string IsActive { get; set; } = "true";
+    public bool IsActive { get; set; } = true;
 
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
