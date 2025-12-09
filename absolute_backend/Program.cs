@@ -1,7 +1,9 @@
+
 using Application.Validators;
 using Infrastructure.Data;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +15,11 @@ using Application.Mappers;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Filters;
 using StackExchange.Redis;
+using Application.Abstractions;
+using Infrastructure.Auth;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+
 
 try
 {
@@ -86,6 +93,45 @@ try
 
             return new BadRequestObjectResult(response);
         };
+    });
+    // 1) Options bind
+    builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+
+    // 2) TokenService kaydı
+    builder.Services.AddScoped<ITokenService, TokenService>();
+
+    // 3) JwtOptions değerlerini al (validation için)
+    var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
+    var key = Encoding.UTF8.GetBytes(jwtOptions.SecretKey);
+
+    // 4) Authentication pipeline
+    builder.Services
+        .AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.RequireHttpsMetadata = false; // Dev’de böyle
+            options.SaveToken = true;
+
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = jwtOptions.Issuer,
+                ValidateAudience = true,
+                ValidAudience = jwtOptions.Audience,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.FromSeconds(30)
+            };
+        });
+
+    builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
     });
 
 #pragma warning disable CS0612
