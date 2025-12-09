@@ -22,6 +22,8 @@ public class AppDbContext : DbContext
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<OrderState> OrderStates => Set<OrderState>();
 
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+
     public DbSet<OrderHistory> OrderHistories => Set<OrderHistory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
