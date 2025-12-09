@@ -41,7 +41,7 @@ public sealed class AuthService : IAuthService
         RegisterRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        // Email veya kullanıcı adı alınmış mı?
+        // check if user and email has taken.
         var exists = await _dbContext.Users
             .AnyAsync(u => u.Email == request.Email || u.Username == request.UserName, cancellationToken);
 
@@ -101,7 +101,7 @@ public sealed class AuthService : IAuthService
         RefreshTokenRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        // 1) Expired access token'dan userId çek
+        // 1) Extract userId from expired access token
         var principal = _tokenService.GetPrincipalFromExpiredToken(request.AccessToken)
                        ?? throw new InvalidOperationException("Invalid access token.");
 
@@ -111,12 +111,12 @@ public sealed class AuthService : IAuthService
         if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out var userId))
             throw new InvalidOperationException("Invalid token payload.");
 
-        // 2) Redis üzerinden hızlı check
+        // 2) fast check Redis
         var redisKey = GetRefreshKey(request.RefreshToken);
         var redisUserId = await _redis.StringGetAsync(redisKey);
         if (redisUserId.IsNullOrEmpty)
         {
-            // Redis'te yoksa DB'ye bakacağız (cache miss)
+            // if there is no value in redis(cache miss), we fall back to db check
             _logger.LogDebug("Refresh token not found in Redis, falling back to DB.");
         }
         else if (redisUserId != userId.ToString())
@@ -124,7 +124,7 @@ public sealed class AuthService : IAuthService
             throw new InvalidOperationException("Invalid refresh token.");
         }
 
-        // 3) DB üzerinden refresh token doğrula
+        // 3) check refresh token in DB
         var user = await _dbContext.Users
             .Include(u => u.RefreshTokens)
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken)
@@ -135,10 +135,10 @@ public sealed class AuthService : IAuthService
         if (tokenEntity is null || tokenEntity.IsExpired || tokenEntity.IsRevoked)
             throw new InvalidOperationException("Invalid refresh token.");
 
-        // Eski refresh token'ı revoke et
+        // revoke old token
         tokenEntity.RevokedAtUtc = DateTime.UtcNow;
 
-        // Redis'ten temizle
+        // clear redis
         await _redis.KeyDeleteAsync(redisKey);
 
         var authResponse = await GenerateAndPersistTokensAsync(user, cancellationToken);
@@ -165,7 +165,7 @@ public sealed class AuthService : IAuthService
         _logger.LogInformation("Refresh token revoked for user {UserId}.", token.UserId);
     }
 
-    // Ortak token üretim + DB + Redis kaydı
+    // Common token generation + DB + Redis persistence
     private async Task<AuthResponseDto> GenerateAndPersistTokensAsync(User user, CancellationToken cancellationToken)
     {
         var (accessToken, accessExpires) = _tokenService.GenerateAccessToken(user);
