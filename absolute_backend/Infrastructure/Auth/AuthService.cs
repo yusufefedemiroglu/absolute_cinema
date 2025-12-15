@@ -19,7 +19,6 @@ public sealed class AuthService : IAuthService
     private readonly AppDbContext _dbContext;
     private readonly ITokenService _tokenService;
     private readonly IDatabase _redis;
-    private readonly JwtOptions _jwtOptions;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
@@ -32,7 +31,6 @@ public sealed class AuthService : IAuthService
         _dbContext = dbContext;
         _tokenService = tokenService;
         _redis = connectionMultiplexer.GetDatabase();
-        _jwtOptions = jwtOptions.Value;
         _logger = logger;
     }
 

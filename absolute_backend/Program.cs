@@ -125,7 +125,7 @@ try
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.FromSeconds(30)
+                ClockSkew = TimeSpan.FromMinutes(10)
             };
         });
 
@@ -151,6 +151,10 @@ try
     }
 
     app.UseHttpsRedirection();
+
+    app.UseAuthentication();
+
+    app.UseAuthorization();
 
     app.MapControllers();
 

@@ -34,7 +34,9 @@ public sealed class TokenService : ITokenService
             new(JwtRegisteredClaimNames.Email, user.Email),
 
             // Roles for now single role as string, can be extended to multiple roles if needed
-            new(ClaimTypes.Role, user.Roles)
+            new(ClaimTypes.Role, user.Roles),
+            new(JwtRegisteredClaimNames.Iat, ((DateTimeOffset)now).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
+
         };
 
         var signingCredentials = new SigningCredentials(
@@ -46,7 +48,6 @@ public sealed class TokenService : ITokenService
             issuer: _options.Issuer,
             audience: _options.Audience,
             claims: claims,
-            notBefore: now,
             expires: expires,
             signingCredentials: signingCredentials
         );
@@ -79,11 +80,11 @@ public sealed class TokenService : ITokenService
             ValidIssuer = _options.Issuer,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(_key),
-
             // here is the key part:
             // We want to parse the expired access token in the refresh flow
             // close the lifetime validation
-            ValidateLifetime = false
+            ValidateLifetime = false,
+            ClockSkew = TimeSpan.FromMinutes(5) // --- ADDED ---
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
