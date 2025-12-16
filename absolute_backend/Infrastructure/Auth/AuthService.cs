@@ -96,11 +96,12 @@ public sealed class AuthService : IAuthService
 
     // REFRESH
     public async Task<AuthResponseDto> RefreshTokenAsync(
-        RefreshTokenRequestDto request,
+        string accessToken,
+        string refreshToken,
         CancellationToken cancellationToken = default)
     {
         // 1) Extract userId from expired access token
-        var principal = _tokenService.GetPrincipalFromExpiredToken(request.AccessToken)
+        var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken)
                        ?? throw new InvalidOperationException("Invalid access token.");
 
         var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)
@@ -110,7 +111,7 @@ public sealed class AuthService : IAuthService
             throw new InvalidOperationException("Invalid token payload.");
 
         // 2) fast check Redis
-        var redisKey = GetRefreshKey(request.RefreshToken);
+        var redisKey = GetRefreshKey(refreshToken);
         var redisUserId = await _redis.StringGetAsync(redisKey);
         if (redisUserId.IsNullOrEmpty)
         {
@@ -128,7 +129,7 @@ public sealed class AuthService : IAuthService
             .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken)
             ?? throw new InvalidOperationException("User not found.");
 
-        var tokenEntity = user.RefreshTokens.SingleOrDefault(rt => rt.Token == request.RefreshToken);
+        var tokenEntity = user.RefreshTokens.SingleOrDefault(rt => rt.Token == refreshToken);
 
         if (tokenEntity is null || tokenEntity.IsExpired || tokenEntity.IsRevoked)
             throw new InvalidOperationException("Invalid refresh token.");
@@ -186,7 +187,6 @@ public sealed class AuthService : IAuthService
         return new AuthResponseDto
         {
             AccessToken = accessToken,
-            RefreshToken = refreshToken,
             AccessTokenExpiresAtUtc = accessExpires,
             RefreshTokenExpiresAtUtc = refreshExpires
         };
