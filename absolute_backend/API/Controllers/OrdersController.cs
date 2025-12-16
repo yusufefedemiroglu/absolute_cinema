@@ -1,4 +1,5 @@
 using Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -15,6 +16,7 @@ public class OrdersController : ControllerBase
     }
 
     // 🔹 Create Order
+    [Authorize]
     [HttpPost("create")]
     public async Task<IActionResult> Create([FromBody] CreateOrderDto dto)
     {

@@ -47,37 +47,58 @@ public class AuthController : ControllerBase
     }
 
     // POST api/auth/refresh
+    // POST api/auth/refresh
     [AllowAnonymous]
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh(
-        CancellationToken cancellationToken)
+    /// <summary>
+    /// Issues a new access token using refresh token stored in HttpOnly cookie.
+    /// </summary>
+    /// <remarks>
+    /// Refresh token is read from HttpOnly cookie automatically.
+    /// Access token must be sent via Authorization header.
+    /// </remarks>
+    public async Task<IActionResult> Refresh(CancellationToken cancellationToken)
     {
-        var refreshToken = Request.Cookies[RefreshCookieName] ?? throw new UnauthorizedAccessException
-        ("Refresh token cookie is missing.");
+        var refreshToken = Request.Cookies[RefreshCookieName];
+        if (string.IsNullOrWhiteSpace(refreshToken))
+            return Unauthorized("Refresh token cookie is missing.");
 
-        var accessToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        if (!Request.Headers.TryGetValue("Authorization", out var authHeader))
+            return Unauthorized("Authorization header is missing.");
 
-        if (string.IsNullOrEmpty(accessToken))
-        {
-            throw new UnauthorizedAccessException("Access token is missing.");
-        }
+        var accessToken = authHeader.ToString();
+        if (!accessToken.StartsWith("Bearer "))
+            return Unauthorized("Invalid authorization header.");
 
-        var result = await _authService.RefreshTokenAsync(accessToken, refreshToken, cancellationToken);
+        accessToken = accessToken["Bearer ".Length..];
 
-        var newRefreshToken = HttpContext.Items["RefreshToken"] as string ?? "";
+        var result = await _authService.RefreshTokenAsync(
+            accessToken,
+            refreshToken,
+            cancellationToken
+        );
+
+        var newRefreshToken = HttpContext.Items["RefreshToken"] as string;
         if (!string.IsNullOrEmpty(newRefreshToken))
         {
             Response.Cookies.Append(
-        RefreshCookieName,
-        newRefreshToken,
-        CookieOptionsFactory.RefreshToken(result.RefreshTokenExpiresAtUtc)
-    );
+                RefreshCookieName,
+                newRefreshToken,
+                CookieOptionsFactory.RefreshToken(result.RefreshTokenExpiresAtUtc)
+            );
         }
+
         return Ok(result);
     }
 
     [Authorize]
     [HttpPost("revoke")]
+    /// <summary>
+    /// Revokes the current refresh token.
+    /// </summary>
+    /// <remarks>
+    /// Refresh token is read from HttpOnly cookie and revoked server-side.
+    /// </remarks>
     public async Task<IActionResult> Revoke(CancellationToken cancellationToken)
     {
         var refreshToken = Request.Cookies["refreshToken"];
