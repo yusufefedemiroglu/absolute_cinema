@@ -212,3 +212,63 @@ License
 
 This project is for educational and demonstration purposes.
 ```
+---
+
+## Getting Started (How to Run the Project)
+
+This section explains how to run the project locally from scratch.
+
+### Prerequisites
+
+Make sure the following tools are installed on your machine:
+
+- .NET 8 SDK
+- SQL Server (local or Docker)
+- Redis (local or Docker)
+- Git
+
+Optional but recommended:
+- Docker Desktop
+- Elasticsearch (for logs)
+
+---
+
+## Clone the Repository
+
+```bash
+git clone https://github.com/your-username/absolute-cinema-backend.git
+cd absolute-cinema-backend
+
+
+Initialize User Secrets
+dotnet user-secrets init
+Required Secrets
+
+Set the following secrets:
+dotnet user-secrets set "Jwt:SecretKey" "YOUR_SUPER_SECRET_KEY"
+dotnet user-secrets set "Jwt:Issuer" "absolute-cinema-api"
+dotnet user-secrets set "Jwt:Audience" "absolute-cinema-client"
+dotnet user-secrets set "Jwt:AccessTokenMinutes" "15"
+dotnet user-secrets set "Jwt:RefreshTokenDays" "7"
+
+dotnet user-secrets set "Redis:Connection" "localhost:6379"
+
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" \
+"Server=localhost,1433;Database=absolute_cinema;User Id=yourid;Password=YourPassword;TrustServerCertificate=True;"
+Apply database migrations:
+
+dotnet ef database update
+
+Running Redis (Optional via Docker)
+
+docker run -d -p 6379:6379 redis
+
+Run the Application
+dotnet run
+
+The API will be available at:
+http://localhost:5190
+
+
+
+
