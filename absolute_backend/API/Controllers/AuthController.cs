@@ -1,3 +1,4 @@
+using API.Security;
 using Application.Abstractions;
 using Application.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
@@ -10,6 +11,7 @@ namespace API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private const string RefreshCookieName = "refreshToken";
 
     public AuthController(IAuthService authService)
     {
@@ -35,6 +37,12 @@ public class AuthController : ControllerBase
         CancellationToken cancellationToken)
     {
         var result = await _authService.LoginAsync(request, cancellationToken);
+        var refreshToken = HttpContext.Items["RefreshToken"] as string ?? "";
+        Response.Cookies.Append(
+    RefreshCookieName,
+    refreshToken,
+    CookieOptionsFactory.RefreshToken(result.RefreshTokenExpiresAtUtc)
+);
         return Ok(result);
     }
 
@@ -42,21 +50,48 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh(
-        [FromBody] RefreshTokenRequestDto request,
         CancellationToken cancellationToken)
     {
-        var result = await _authService.RefreshTokenAsync(request, cancellationToken);
+        var refreshToken = Request.Cookies[RefreshCookieName] ?? throw new UnauthorizedAccessException
+        ("Refresh token cookie is missing.");
+
+        var accessToken = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+        if (string.IsNullOrEmpty(accessToken))
+        {
+            throw new UnauthorizedAccessException("Access token is missing.");
+        }
+
+        var result = await _authService.RefreshTokenAsync(accessToken, refreshToken, cancellationToken);
+
+        var newRefreshToken = HttpContext.Items["RefreshToken"] as string ?? "";
+        if (!string.IsNullOrEmpty(newRefreshToken))
+        {
+            Response.Cookies.Append(
+        RefreshCookieName,
+        newRefreshToken,
+        CookieOptionsFactory.RefreshToken(result.RefreshTokenExpiresAtUtc)
+    );
+        }
         return Ok(result);
     }
 
-    // POST api/auth/revoke
     [Authorize]
     [HttpPost("revoke")]
-    public async Task<IActionResult> Revoke(
-        [FromBody] RevokeTokenRequestDto request,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> Revoke(CancellationToken cancellationToken)
     {
-        await _authService.RevokeRefreshTokenAsync(request, cancellationToken);
+        var refreshToken = Request.Cookies["refreshToken"];
+
+        if (string.IsNullOrWhiteSpace(refreshToken))
+            return NoContent();
+
+        await _authService.RevokeRefreshTokenAsync(
+            refreshToken,
+            cancellationToken
+        );
+
+        Response.Cookies.Delete("refreshToken");
+
         return NoContent();
     }
 }

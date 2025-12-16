@@ -11,5 +11,5 @@ public interface IAuthService
         string refreshToken,
         CancellationToken cancellationToken = default
         );
-    Task RevokeRefreshTokenAsync(RevokeTokenRequestDto request, CancellationToken cancellationToken = default);
+    Task RevokeRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default);
 }

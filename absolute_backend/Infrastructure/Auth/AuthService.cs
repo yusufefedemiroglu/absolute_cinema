@@ -148,11 +148,11 @@ public sealed class AuthService : IAuthService
 
     // LOGOUT / REVOKE
     public async Task RevokeRefreshTokenAsync(
-        RevokeTokenRequestDto request,
+        string refreshToken,
         CancellationToken cancellationToken = default)
     {
         var token = await _dbContext.RefreshTokens
-            .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken, cancellationToken);
+            .FirstOrDefaultAsync(rt => rt.Token == refreshToken, cancellationToken);
 
         if (token is null)
             return;
@@ -160,7 +160,7 @@ public sealed class AuthService : IAuthService
         token.RevokedAtUtc = DateTime.UtcNow;
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        await _redis.KeyDeleteAsync(GetRefreshKey(request.RefreshToken));
+        await _redis.KeyDeleteAsync(GetRefreshKey(refreshToken));
         _logger.LogInformation("Refresh token revoked for user {UserId}.", token.UserId);
     }
 
