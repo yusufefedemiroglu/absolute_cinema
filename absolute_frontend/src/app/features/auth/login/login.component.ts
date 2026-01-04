@@ -104,9 +104,7 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   }
 
 
-  onSocial(platform: 'behance' | 'dribbble'): void {
-    console.log(`Social login clicked: ${platform}`);
-  }
+ 
 
   // Form submit
   onSubmit(): void {
@@ -141,8 +139,8 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
 
     if (c.hasError('required')) {
       return controlName === 'password'
-        ? 'Your creative password is required'
-        : 'Your creative email is required';
+        ? 'Your password is required'
+        : 'Your email is required';
     }
 
     if (c.hasError('minlength')) {
