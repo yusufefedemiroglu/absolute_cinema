@@ -967,4 +967,65 @@
   .floating-shapes .shape {
     opacity: 0.5;
   }
+  /* ---------- Register Panel (non-breaking) ---------- */
+
+.register-panel {
+  display: none; // default hidden
+}
+
+.login-card.show-register {
+  // login UI’yi gizle
+  .login-header:not(.register-header),
+  .login-form:not(.register-form),
+  .divider,
+  .creative-social,
+  .signup-link,
+  .success-message {
+    display: none !important;
+  }
+
+  // register’ı göster
+  .register-panel {
+    display: block;
+    animation: registerFadeIn 0.5s ease both;
+  }
+}
+
+.register-header {
+  margin-bottom: 24px;
+}
+
+.register-footer {
+  text-align: center;
+  margin-top: 14px;
+
+  p {
+    color: #718096;
+    font-size: 14px;
+    font-style: italic;
+  }
+
+  a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: #553c9a;
+      text-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+    }
+  }
+}
+
+@keyframes registerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 }

@@ -16,6 +16,8 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 
+import { AuthService } from '../../../core/auth/auth.service';
+
 @Component({
   selector: 'app-login',
 
@@ -144,7 +146,7 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
     }
 
     if (c.hasError('minlength')) {
-      return 'Password needs at least 6 characters to unlock creativity';
+      return 'Password needs at least 6 characters long';
     }
 
     return 'Invalid value';

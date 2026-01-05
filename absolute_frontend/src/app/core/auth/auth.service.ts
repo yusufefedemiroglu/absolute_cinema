@@ -13,4 +13,25 @@ export class AuthService {
         });
     }
 
+    login(dto: LoginRequestDto) {
+        return this.http.post<AuthResponseDto>(`${this.baseUrl}/login`, dto,{
+            withCredentials: true
+        });
+    }
+
+    refresh(accessToken: string) {
+        return this.http.post<AuthResponseDto>(`${this.baseUrl}/refresh`, {},{
+            withCredentials: true,
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+    }
+    
+    revoke() {
+        return this.http.post<void>(`${this.baseUrl}/revoke`, {},{
+            withCredentials: true
+        });
+    }
+
 }
