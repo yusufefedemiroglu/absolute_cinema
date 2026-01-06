@@ -15,7 +15,7 @@ import {
   AbstractControl,
   ReactiveFormsModule,
 } from '@angular/forms';
-
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
@@ -25,7 +25,7 @@ import { AuthService } from '../../../core/auth/auth.service';
   standalone: true,
 
   // we need ReactiveFormsModule for reactive forms
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
 
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
