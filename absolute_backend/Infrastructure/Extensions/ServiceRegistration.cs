@@ -33,6 +33,7 @@ public static class ServiceRegistration
         services.AddScoped<LoggingActionFilter>();
         services.AddScoped<ICacheService, RedisCacheService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<Application.Services.UserService>();
         return services;
     }
 
