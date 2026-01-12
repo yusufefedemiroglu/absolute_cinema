@@ -52,6 +52,7 @@ try
     {
         cfg.AddProfile<ProductProfile>();
         cfg.AddProfile<TitleProfile>();
+        cfg.AddProfile<UserProfile>();
     });
 
     builder.Services.AddSwaggerGen(options =>

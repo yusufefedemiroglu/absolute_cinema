@@ -21,6 +21,7 @@ public class AuthController : ControllerBase
     // POST api/auth/register
     [AllowAnonymous]
     [HttpPost("register")]
+    //we dont need it now.
     public async Task<IActionResult> Register(
         [FromBody] RegisterRequestDto request,
         CancellationToken cancellationToken)
