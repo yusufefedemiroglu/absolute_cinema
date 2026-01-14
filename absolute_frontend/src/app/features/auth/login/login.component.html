@@ -28,8 +28,8 @@
           <div class="logo-circle circle-2"></div>
           <div class="logo-circle circle-3"></div>
         </div>
-        <h2>Creative Portal</h2>
-        <p>Enter your creative space</p>
+        <h2>Admin Panel</h2>
+        <p>Login</p>
       </div>
 
       <!-- LOGIN FORM (Angular) -->
@@ -96,21 +96,16 @@
               <div class="checkbox-creative">
                 <div class="check-mark">✓</div>
               </div>
-              Stay creative
+              Remember me
             </label>
           </div>
-
-          <!-- UI only for now -->
-          <a href="#" class="forgot-password" (click)="$event.preventDefault()">
-            Forgot your spark?
-          </a>
         </div>
 
         <!-- Submit -->
         <button type="submit" class="login-btn" [class.loading]="isLoading" [disabled]="isLoading">
           <span class="btn-bg"></span>
 
-          <span class="btn-text" *ngIf="!isLoading">Enter Creative Space</span>
+          <span class="btn-text" *ngIf="!isLoading">Login</span>
 
           <span class="btn-loader" *ngIf="isLoading">
             <div class="loader-dot dot-1"></div>
@@ -120,21 +115,14 @@
         </button>
       </form>
 
-      <!-- Divider -->
-      <div class="divider">
-        <div class="divider-line"></div>
-        <span>or explore with</span>
-        <div class="divider-line"></div>
-      </div>
-
+      <!-- it was for fake login test -->
       <!-- Success overlay -->
       <div class="success-message" *ngIf="showSuccess">
         <div class="success-animation">
           <div class="success-circle"></div>
           <div class="success-checkmark">✓</div>
         </div>
-        <h3>Welcome, Creator!</h3>
-        <p>Entering your creative dimension...</p>
+        <h3>Welcome</h3>
       </div>
     </div>
   </div>
