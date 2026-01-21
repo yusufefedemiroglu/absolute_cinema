@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { TokenStore } from '../auth/token.store';
+import { AuthResponseDto } from '../auth/auth.models';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const tokenStore = inject(TokenStore);
@@ -35,9 +36,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
       // 3) if 401 try to refresh token
       return authService.refresh(currentToken).pipe(
-        switchMap((res) => {
+        switchMap((res: AuthResponseDto) => {
           // access token name which comes from backend
-          const newToken = (res as any).accessToken;
+          const newToken = res.accessToken;
           if (!newToken) return throwError(() => err);
 
           tokenStore.set(newToken);
