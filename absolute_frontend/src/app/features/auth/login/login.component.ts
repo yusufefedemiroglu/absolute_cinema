@@ -11,6 +11,7 @@ import {
 import {
   FormBuilder,
   Validators,
+  FormControl,
   FormGroup,
   AbstractControl,
   ReactiveFormsModule,
@@ -54,7 +55,7 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
     private renderer: Renderer2,
     private host: ElementRef<HTMLElement>,
     private authService: AuthService,
-    private tokenstore: TokenStore,
+    private tokenStore: TokenStore,
   ) {
     // form initialization on constructor
     this.form = this.fb.group({
@@ -109,7 +110,7 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
-
+ 
 
  
 
@@ -124,14 +125,15 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
 
     this.isLoading = true;
 
+
     const dto: LoginRequestDto = {
-      userNameOrEmail: this.form.value.userNameOrEmail,
-      password: this.form.value.password,
+      userNameOrEmail: this.form.get('userNameOrEmail')?.value ?? '' ,
+      password: this.form.get('password')?.value ?? '',
     };
 
     this.authService.login(dto).subscribe({
       next: (res) => {
-        this.tokenstore.set(res.accessToken);
+        this.tokenStore.set(res.accessToken);
         this.isLoading = false;
         this.showSuccess = true;
         // setTimeout(() => {
