@@ -134,6 +134,7 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
     this.authService.login(dto).subscribe({
       next: (res) => {
         this.tokenStore.set(res.accessToken);
+        console.log('TOKEN STORED:', this.tokenStore.get());
         this.isLoading = false;
         this.showSuccess = true;
         // setTimeout(() => {

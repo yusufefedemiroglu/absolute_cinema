@@ -24,8 +24,8 @@ export class AuthService {
         return this.http.post<AuthResponseDto>(`${this.baseUrl}/login`, dto,{
             withCredentials: true
         }).pipe(
-            tap(res => {
-                this.setaccessToken(res.accessToken);
+            tap(({ accessToken })=> {
+                this.setaccessToken(accessToken);
             })
         );
     }
