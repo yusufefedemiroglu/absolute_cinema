@@ -170,6 +170,15 @@ try
 #pragma warning disable CS0612
     builder.Services.AddApplicationServices().AddInfrastructureServices(builder.Configuration);
 #pragma warning restore CS0612
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("Frontend", p =>
+            p.WithOrigins("http://localhost:4200")   // Angular dev server
+             .AllowAnyHeader()
+             .AllowAnyMethod()
+             .AllowCredentials()
+        );
+    });
 
     var app = builder.Build();
 
@@ -184,7 +193,8 @@ try
     }
 
     app.UseHttpsRedirection();
-
+    app.UseRouting();
+    app.UseCors("Frontend");
     app.UseAuthentication();
 
     app.UseAuthorization();
