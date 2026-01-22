@@ -15,8 +15,11 @@ import {
   AbstractControl,
   ReactiveFormsModule,
 } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/auth/auth.service';
+import { TokenStore } from '../../../core/auth/token.store';
+import { LoginRequestDto } from '../../../core/auth/auth.models';
 
 @Component({
   selector: 'app-login',
@@ -49,7 +52,9 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private renderer: Renderer2,
-    private host: ElementRef<HTMLElement>
+    private host: ElementRef<HTMLElement>,
+    private authService: AuthService,
+    private tokenstore: TokenStore,
   ) {
     // form initialization on constructor
     this.form = this.fb.group({
@@ -112,20 +117,39 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   onSubmit(): void {
     if (this.isLoading) return;
 
+
     // make all fields touched to trigger validation
     this.form.markAllAsTouched();
-
-    if (this.form.invalid) {
-      return;
-    }
+    if (this.form.invalid) return;
 
     this.isLoading = true;
 
-    // Fake login (UI test)
-    setTimeout(() => {
-      this.isLoading = false;
-      this.showSuccess = true;
-    }, 1200);
+    const dto: LoginRequestDto = {
+      userNameOrEmail: this.form.value.userNameOrEmail,
+      password: this.form.value.password,
+    };
+
+    this.authService.login(dto).subscribe({
+      next: (res) => {
+        this.tokenstore.set(res.accessToken);
+        this.isLoading = false;
+        this.showSuccess = true;
+        // setTimeout(() => {
+        //   this.router.navigatebyUrl('/dashboard');
+        // }, 400);
+      },error: (err) => {
+        console.error('Login error:', err);
+        this.isLoading = false;
+        this.showSuccess = false;
+      }
+
+    });
+    // // Fake login (UI test)
+    // setTimeout(() => {
+    //   this.isLoading = false;
+    //   this.showSuccess = true;
+    // }, 1200);
+
   }
 
   // Template push error 
